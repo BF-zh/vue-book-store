@@ -37,6 +37,17 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
-    },
+    }
   },
+  server: {
+  // port: 8001,
+  // open: true,
+    proxy: {
+      '/app-dev': {
+        target: 'http://localhost:8080/api',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/app-dev/, '')
+      }
+    }
+  }
 })
