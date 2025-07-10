@@ -1,0 +1,17 @@
+import { createHead } from '@vueuse/head'
+import persistedstate from 'pinia-plugin-persistedstate'
+import { DataLoaderPlugin } from 'unplugin-vue-router/data-loaders'
+import App from './App.vue'
+import router from './router'
+import 'uno.css'
+import '@unocss/reset/tailwind.css'
+
+const pinia = createPinia()
+pinia.use(persistedstate)
+
+createApp(App)
+  .use(DataLoaderPlugin, { router })
+  .use(router)
+  .use(createHead())
+  .use(pinia)
+  .mount('#app')
