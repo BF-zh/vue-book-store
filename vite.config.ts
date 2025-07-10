@@ -9,6 +9,7 @@ import { defineConfig } from 'vite'
 import Inspect from 'vite-plugin-inspect'
 import Inspector from 'vite-plugin-vue-inspector'
 import Layouts from 'vite-plugin-vue-layouts'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [VueRouter({
@@ -26,10 +27,12 @@ export default defineConfig({
     imports: ['vue', VueRouterAutoImports, 'pinia', '@vueuse/core', '@vueuse/head'],
     vueTemplate: true,
     dts: 'types/auto-imports.d.ts',
+    resolvers: [ElementPlusResolver()],
   }), Components({
     dirs: ['src/components'],
     dts: 'types/components.d.ts',
     include: [/\.vue$/, /\.vue\?vue/, /\.vue\?vue-component/],
+    resolvers: [ElementPlusResolver()],
   })],
   resolve: {
     alias: {
