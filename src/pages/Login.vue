@@ -5,12 +5,12 @@
       <form @submit.prevent="handleLogin">
         <div class="form-row">
           <label for="username">用户名</label>
-          <input id="username" v-model="userForm.username" required />
+          <input id="username" v-model="form.username" required />
         </div>
 
         <div class="form-row">
           <label for="password">密&emsp;码</label>
-          <input id="password" type="password" v-model="userForm.password" required />
+          <input id="password" type="password" v-model="form.password" required />
         </div>
         <div class="form-row">
           <label for="">身&emsp;份</label>
@@ -39,12 +39,15 @@ definePage({
 })
 
 import { ref, reactive } from 'vue'
-import { login } from '../api/request'
-import type { UserInfo, UserLogin } from '../types/user'
-const userForm = reactive<UserLogin>({
+import { userLogin } from '../api/request'
+import type { UserInfo, Login } from '../types/user'
+import { useAdminStore } from '../store/auth'
+const adminAuth = useAdminStore()
+const form = reactive<Login>({
   username: '',
   password: ''
 })
+
 const value = ref('0')
 const options = [
   {
@@ -59,9 +62,12 @@ const options = [
 const rememberMe = ref(false)
 
 const handleLogin = async () => {
-  console.log(value);
 
-  const userInfo: UserInfo = await login(userForm)
+  if(value.value){
+    await adminAuth.login(form)
+    return
+  }
+  const userInfo: UserInfo = await userLogin(form)
 }
 </script>
 

@@ -1,5 +1,4 @@
 import axios from "axios";
-import { ElMessage } from "element-plus";
 
 const http = axios.create({
     baseURL: '/app-dev/',
@@ -8,17 +7,22 @@ const http = axios.create({
 
 
 http.interceptors.request.use((config) => {
+    config.headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`
     return config
 })
 
 
-http.interceptors.request.use((res) => {
-    const {data} = res.data
-    if(data.code !== 200){
-        ElMessage.error(data.message)
-    }
-    return data
-})
+http.interceptors.response.use(
+    res => {
+        const {data} = res
+        if (data.code !== 200) {
+            return Promise.reject(new Error(data.message || 'Error'))
+        }
+
+        return Promise.resolve(data)
+    }, 
+    err => Promise.reject(err)
+)
 
 
 export default http
