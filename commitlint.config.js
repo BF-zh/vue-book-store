@@ -1,6 +1,6 @@
-// .commitlintrc.js
-/** @type {import('cz-git').UserConfig} */
-module.exports = {
+import { defineConfig } from 'cz-git'
+
+export default defineConfig({
   rules: {
     // @see: https://commitlint.js.org/#/reference-rules
   },
@@ -68,4 +68,4 @@ module.exports = {
     defaultScope: '',
     defaultSubject: '',
   },
-}
+})
