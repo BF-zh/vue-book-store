@@ -15,7 +15,7 @@ export const useAdminStore = defineStore('adminAuth', () => {
       return ElMessage.error('不能为空')
 
     adminData.value = await adminLogin(form)
-    if (adminData.value.code != 200) {
+    if (adminData.value.code !== 200) {
       ElMessage.error(adminData.value.message)
       return
     }
