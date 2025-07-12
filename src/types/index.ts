@@ -1,10 +1,4 @@
-export interface ResData<T> {
-  /* */
-  code: number
-
-  /* */
-  message: string
-
-  /* */
-  data: T
-}
+export * from './admin'
+export * from './res'
+export * from './typeing'
+export * from './user'

@@ -1,12 +1,20 @@
-<script setup>
+<script setup lang="ts">
+import type { AdminLoginParams } from '../types/admin'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAdminStore } from '../store/authStore'
 
 definePage({
   name: 'dashboard',
   meta: {
-    isPublic: true,
+    isPublic: false,
   },
+})
+const adminStore = useAdminStore()
+
+let adminInfo = reactive<AdminLoginParams | object>({})
+onMounted(async () => {
+  adminInfo = await adminStore.adminInfo() as AdminLoginParams
 })
 
 const router = useRouter()
@@ -19,11 +27,12 @@ const menuTitleMap = {
   stats: '数据统计',
 }
 
-function handleMenuSelect(key) {
+function handleMenuSelect(key: string) {
   activeMenu.value = key
 }
 
 function logout() {
+  localStorage.removeItem('token')
   router.push('/login')
 }
 </script>

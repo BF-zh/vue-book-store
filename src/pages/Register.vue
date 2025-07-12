@@ -1,24 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import type { RegisterParams } from '@/types'
 
+const userStore = useUserStore()
 definePage({
   name: 'register',
   meta: {
     isPublic: true,
   },
 })
+const regForm = reactive<RegisterParams>({
+  nickname: '',
+  userId: '',
+  password: '',
+  checkPassword: '',
+})
 
-const name = ref('')
-const username = ref('')
-const password = ref('')
-const confirm = ref('')
-
-function handleRegister() {
-  if (password.value !== confirm.value) {
-    alert('两次密码不一致！')
+async function handleRegister() {
+  if (regForm.nickname === '' || regForm.userId === '' || regForm.password === '' || regForm.checkPassword === '') {
+    ElMessage.error('所有字段都是必填的')
     return
   }
-  alert(`注册成功：${name.value} (${username.value})`)
+  if (regForm.password !== regForm.checkPassword) {
+    ElMessage.error('两次输入的密码不一致')
+    return
+  }
+  await userStore.register(regForm)
 }
 </script>
 
@@ -29,22 +35,22 @@ function handleRegister() {
       <form @submit.prevent="handleRegister">
         <div class="form-row">
           <label for="name">昵&emsp;&emsp;称</label>
-          <input id="name" v-model="name" required>
+          <input id="name" v-model="regForm.nickname" required>
         </div>
 
         <div class="form-row">
-          <label for="username">用&nbsp;户&nbsp;名</label>
-          <input id="username" v-model="username" required>
+          <label for="username">账&emsp;&emsp;号</label>
+          <input id="username" v-model="regForm.userId" required>
         </div>
 
         <div class="form-row">
           <label for="password">密&emsp;&emsp;码</label>
-          <input id="password" v-model="password" type="password" required>
+          <input id="password" v-model="regForm.password" type="password" required>
         </div>
 
         <div class="form-row">
           <label for="confirm">确认密码</label>
-          <input id="confirm" v-model="confirm" type="password" required>
+          <input id="confirm" v-model="regForm.checkPassword" type="password" required>
         </div>
 
         <button class="login-button" type="submit">

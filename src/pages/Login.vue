@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { Login, UserInfo } from '../types/user'
+import type { Login } from '../types/user'
 import { reactive, ref } from 'vue'
-import { userLogin } from '../api/request'
-import { useAdminStore } from '../store/auth'
+import { useAdminStore } from '../store/authStore'
 
 definePage({
   name: 'login',
@@ -11,19 +10,20 @@ definePage({
   },
 })
 const adminAuth = useAdminStore()
+const usersAuth = useUserStore()
 const form = reactive<Login>({
   username: '',
   password: '',
 })
 
-const value = ref('0')
+const value = ref(0)
 const options = [
   {
-    value: '0',
+    value: 0,
     label: '用户',
   },
   {
-    value: '1',
+    value: 1,
     label: '管理员',
   },
 ]
@@ -32,19 +32,18 @@ const rememberMe = ref(false)
 async function handleLogin() {
   if (value.value) {
     await adminAuth.login(form)
-    return
   }
-  const userInfo: UserInfo = await userLogin(form)
+  await usersAuth.login(form)
 }
 </script>
 
 <template>
   <div class="login-page">
     <div class="login-box">
-      <h2>书店管理系统</h2>
+      <h2>网上书店商城</h2>
       <form @submit.prevent="handleLogin">
         <div class="form-row">
-          <label for="username">用户名</label>
+          <label for="username">账&emsp;号</label>
           <input id="username" v-model="form.username" required>
         </div>
 

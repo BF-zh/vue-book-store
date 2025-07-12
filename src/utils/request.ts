@@ -13,13 +13,13 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   (res) => {
     const { data } = res
-    if (data.code !== 200) {
-      return Promise.reject(new Error(data.message || 'Error'))
-    }
+    // if (data.code !== 200) {
+    //   return Promise.reject(new Error(data.message || 'Error'))
+    // }
 
     return Promise.resolve(data)
   },
-  err => Promise.reject(err),
+  err => Promise.reject(new Error(err.message || 'Error')),
 )
 
 export default http

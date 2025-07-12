@@ -14,7 +14,7 @@ import Layouts from 'vite-plugin-vue-layouts'
 export default defineConfig({
   plugins: [
     VueRouter({
-    /* options */
+      /* options */
       dts: 'types/vue-router.d.ts',
       logs: true,
     }),
@@ -38,13 +38,24 @@ export default defineConfig({
     Components({
       dirs: ['src/components'],
       dts: 'types/components.d.ts',
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
       include: [/\.vue$/, /\.vue\?vue/, /\.vue\?vue-component/],
     }),
   ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+    },
+  },
+  server: {
+    // port: 8001,
+    // open: true,
+    proxy: {
+      '/app-dev': {
+        target: 'http://localhost:8080/api',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/app-dev/, ''),
+      },
     },
   },
 })
