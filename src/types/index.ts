@@ -1,10 +1,14 @@
 export interface ResData<T> {
-  /* */
-  code: number;
+  /* 响应数据码 */
+  code: number
 
-  /* */
-  message: string;
+  /* 响应数据消息 */
+  message: string
 
-  /* */
+  /* 响应数据 */
   data: T
+}
+
+export interface Token {
+  token: string
 }

@@ -2,6 +2,7 @@ import path from 'node:path'
 import vue from '@vitejs/plugin-vue'
 import UnoCSS from 'unocss/vite'
 import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import VueRouter from 'unplugin-vue-router/vite'
@@ -9,7 +10,6 @@ import { defineConfig } from 'vite'
 import Inspect from 'vite-plugin-inspect'
 import Inspector from 'vite-plugin-vue-inspector'
 import Layouts from 'vite-plugin-vue-layouts'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [VueRouter({
@@ -37,7 +37,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
-    }
+    },
   },
   server: {
   // port: 8001,
@@ -46,8 +46,8 @@ export default defineConfig({
       '/app-dev': {
         target: 'http://localhost:8080/api',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/app-dev/, '')
-      }
-    }
-  }
+        rewrite: path => path.replace(/^\/app-dev/, ''),
+      },
+    },
+  },
 })
