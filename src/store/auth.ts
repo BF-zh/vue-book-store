@@ -19,7 +19,7 @@ export const useUserStore = defineStore('userAuth', () => {
     }
     ElMessage.success(registerInfo.value.message)
     setTimeout(() => {
-      router.push('/Login')
+      router.push('/login')
     }, 1500)
   }
 
@@ -38,7 +38,7 @@ export const useUserStore = defineStore('userAuth', () => {
     localStorage.setItem('token', token)
     ElMessage.success('登录成功')
     setTimeout(() => {
-      router.push('/Home')
+      router.push('/home')
     }, 1500)
   }
   // 获取用户信息
@@ -49,14 +49,13 @@ export const useUserStore = defineStore('userAuth', () => {
       localStorage.removeItem('token')
       // return
     }
-    
+
     return res.data
   }
   return { register, login, registerInfo, userInfo }
 })
 
 export const useAdminStore = defineStore('adminAuth', () => {
-
   const login = async (form: Login) => {
     if (form.username == null || form.password == null) {
       ElMessage.error('不能为空')
@@ -77,14 +76,13 @@ export const useAdminStore = defineStore('adminAuth', () => {
 
   const adminInfo = async () => {
     const res = await getAdminInfo()
-    if(res.code === 200){
+    if (res.code === 200) {
       return res.data
     }
     ElMessage.error(res.message)
     // setTimeout(() => {
     //   router.push('/Login')
     // }, 1000);
-
   }
 
   return { login, adminInfo }

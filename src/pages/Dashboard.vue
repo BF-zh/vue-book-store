@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import type { AdminLoginParams } from '../types/admin'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { AdminLoginParams } from '../types/admin'
 import { useAdminStore } from '../store/auth'
+
 definePage({
   name: 'dashboard',
   meta: {
@@ -40,7 +41,7 @@ function logout() {
   <el-container style="height: 100vh">
     <!-- 左侧菜单 -->
     <el-aside width="200px" style="background: #2d3a4b; color: #fff">
-      <div class="logo ">
+      <div class="logo">
         📚 书店后台
       </div>
       <el-menu
@@ -68,8 +69,10 @@ function logout() {
 
     <!-- 主体内容 -->
     <el-container>
-      <el-header style="background: #fff; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
-        <div>当前模块：{{ menuTitleMap[activeMenu] }}</div>
+      <el-header style="background: #2d3a4b; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+        <div class="text-lightBlue">
+          当前模块：{{ menuTitleMap[activeMenu] }}
+        </div>
         <el-button type="danger" size="small" @click="logout">
           退出登录
         </el-button>
