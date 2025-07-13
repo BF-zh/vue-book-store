@@ -3,7 +3,6 @@ import persistedstate from 'pinia-plugin-persistedstate'
 import { DataLoaderPlugin } from 'unplugin-vue-router/data-loaders'
 import App from './App.vue'
 import router from './router'
-import 'uno.css'
 import '@unocss/reset/tailwind.css'
 import 'element-plus/dist/index.css'
 const pinia = createPinia()

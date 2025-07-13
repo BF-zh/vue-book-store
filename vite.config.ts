@@ -12,36 +12,44 @@ import Inspector from 'vite-plugin-vue-inspector'
 import Layouts from 'vite-plugin-vue-layouts'
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [VueRouter({
-    /* options */
-    dts: 'types/vue-router.d.ts',
-    logs: true,
-  }), Layouts(),
-  // Vue 必须在 Layouts、VueRouter 之后
-  vue(), Inspector({
-    enabled: false,
-    toggleButtonVisibility: 'active',
-    launchEditor: 'cursor',
-  }), Inspect(), UnoCSS(), AutoImport({
-    dirs: ['src/store', 'src/hooks'],
-    imports: ['vue', VueRouterAutoImports, 'pinia', '@vueuse/core', '@vueuse/head'],
-    vueTemplate: true,
-    dts: 'types/auto-imports.d.ts',
-    resolvers: [ElementPlusResolver()],
-  }), Components({
-    dirs: ['src/components'],
-    dts: 'types/components.d.ts',
-    include: [/\.vue$/, /\.vue\?vue/, /\.vue\?vue-component/],
-    resolvers: [ElementPlusResolver()],
-  })],
+  plugins: [
+    VueRouter({
+      /* options */
+      dts: 'types/vue-router.d.ts',
+      logs: true,
+    }),
+    Layouts(),
+    // Vue 必须在 Layouts、VueRouter 之后
+    vue(),
+    Inspector({
+      enabled: false,
+      toggleButtonVisibility: 'active',
+      launchEditor: 'cursor',
+    }),
+    Inspect(),
+    UnoCSS(),
+    AutoImport({
+      dirs: ['src/store', 'src/hooks'],
+      resolvers: [ElementPlusResolver()],
+      imports: ['vue', VueRouterAutoImports, 'pinia', '@vueuse/core', '@vueuse/head'],
+      vueTemplate: true,
+      dts: 'types/auto-imports.d.ts',
+    }),
+    Components({
+      dirs: ['src/components'],
+      dts: 'types/components.d.ts',
+      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
+      include: [/\.vue$/, /\.vue\?vue/, /\.vue\?vue-component/],
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
   },
   server: {
-  // port: 8001,
-  // open: true,
+    // port: 8001,
+    // open: true,
     proxy: {
       '/app-dev': {
         target: 'http://localhost:8080/api',

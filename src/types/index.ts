@@ -1,14 +1,4 @@
-export interface ResData<T> {
-  /* 响应数据码 */
-  code: number
-
-  /* 响应数据消息 */
-  message: string
-
-  /* 响应数据 */
-  data: T
-}
-
-export interface Token {
-  token: string
-}
+export * from './admin'
+export * from './res'
+export * from './typeing'
+export * from './user'

@@ -1,8 +1,5 @@
-// .commitlintrc.js
-
 import { defineConfig } from 'cz-git'
 
-// /** @type {import('cz-git').UserConfig} */
 export default defineConfig({
   rules: {
     // @see: https://commitlint.js.org/#/reference-rules
