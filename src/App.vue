@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import { ElConfigProvider } from 'element-plus'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 </script>
 
 <template>
-  <RouterView />
+  <ElConfigProvider :locale="zhCn">
+    <RouterView />
+  </ElConfigProvider>
 </template>
 
 <style scoped>
