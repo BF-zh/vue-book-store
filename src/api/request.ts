@@ -1,6 +1,4 @@
-import type { IRes } from '../types'
-import type { AdminLoginParams } from '../types/admin'
-import type { Login, RegisterParams, UserInfo } from '../types/user'
+import type { AdminLoginParams, IRes, Login, RegisterParams, UserInfo } from '@/types'
 import http from '../utils/request'
 
 export async function userRegister(register: RegisterParams): Promise<IRes<'' | null>> {

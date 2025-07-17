@@ -19,11 +19,13 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/[...all]': RouteRecordInfo<'/[...all]', '/:all(.*)', { all: ParamValue<true> }, { all: ParamValue<false> }>,
-    '/BookManager': RouteRecordInfo<'/BookManager', '/BookManager', Record<never, never>, Record<never, never>>,
-    'dashboard': RouteRecordInfo<'dashboard', '/Dashboard', Record<never, never>, Record<never, never>>,
+    'dashboard': RouteRecordInfo<'dashboard', '/dashboard', Record<never, never>, Record<never, never>, '/dashboard/addBook' | '/dashboard/bookManager'>,
+    '/dashboard/addBook': RouteRecordInfo<'/dashboard/addBook', '/dashboard/addBook', Record<never, never>, Record<never, never>>,
+    '/dashboard/bookManager': RouteRecordInfo<'/dashboard/bookManager', '/dashboard/bookManager', Record<never, never>, Record<never, never>>,
     'home': RouteRecordInfo<'home', '/home', Record<never, never>, Record<never, never>>,
-    'login': RouteRecordInfo<'login', '/Login', Record<never, never>, Record<never, never>>,
-    'register': RouteRecordInfo<'register', '/Register', Record<never, never>, Record<never, never>>,
+    'login': RouteRecordInfo<'login', '/login', Record<never, never>, Record<never, never>>,
+    'register': RouteRecordInfo<'register', '/register', Record<never, never>, Record<never, never>>,
+    '/testupload': RouteRecordInfo<'/testupload', '/testupload', Record<never, never>, Record<never, never>>,
     '/user': RouteRecordInfo<'/user', '/user', Record<never, never>, Record<never, never>, '/user/[id]'>,
     '/user/[id]': RouteRecordInfo<'/user/[id]', '/user/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
   }

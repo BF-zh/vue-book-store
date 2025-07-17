@@ -1,6 +1,4 @@
-import type { IRes } from '../types'
-import type { AdminLoginParams } from '../types/admin'
-import type { UserInfo } from '../types/user'
+import type { AdminLoginParams, IRes, UserInfo } from '@/types'
 import http from '../utils/request'
 
 // const headers = {

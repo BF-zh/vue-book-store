@@ -1,4 +1,5 @@
 export * from './admin'
+export * from './books'
 export * from './res'
 export * from './typeing'
 export * from './user'

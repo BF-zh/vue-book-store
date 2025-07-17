@@ -1,45 +1,43 @@
 <script setup lang="ts">
-// import { computed, ref } from 'vue'
+import AddBook from '@/components/AddBook.vue'
+import { useBookStore } from '@/store/bookStore'
 
-const books = ref([
-  { id: 1, title: 'Vue 3 实战', author: '张三', price: 59 },
-  { id: 2, title: '深入理解 JavaScript', author: '李四', price: 79 },
-  { id: 3, title: 'Spring Boot 精讲', author: '王五', price: 69 },
-])
+const useBook = useBookStore()
+
+const books = useBook.books
 
 const searchKeyword = ref('')
 const currentPage = ref(1)
-const pageSize = 10
+const pageSize = ref(10)
+const url = ref('http://localhost:8080/api/d1f51447-fd2f-4a09-b676-78f63e556fa0-屏幕截图 2025-07-10 233515.png')
 
 const filteredBooks = computed(() => {
   const keyword = searchKeyword.value.trim().toLowerCase()
   if (!keyword)
-    return books.value
-  return books.value.filter(
+    return books
+  return books.filter(
     book =>
       book.title.toLowerCase().includes(keyword)
       || book.author.toLowerCase().includes(keyword),
   )
 })
-
 // 添加逻辑
-const addDialogVisible = ref(false)
-const newBook = ref({ title: '', author: '', price: 0 })
+// const newBook = ref({ title: '', author: '', price: 0 })
+const newBook = ref(useBook.$state.newBook)
 
 function openAddDialog() {
   newBook.value = { title: '', author: '', price: 0 }
-  addDialogVisible.value = true
+  useBook.addDialogVisible = true
 }
 
-function addBook() {
-  const nextId = books.value.length ? Math.max(...books.value.map(b => b.id)) + 1 : 1
-  books.value.push({ id: nextId, ...newBook.value })
-  addDialogVisible.value = false
-}
-
+// function addBook() {
+//   const nextId = books.length ? Math.max(...books.map(b => b.id)) + 1 : 1
+//   books.push({ id: nextId, ...newBook.value })
+//   addDialogVisible.value = false
+// }
 // 删除逻辑
 function deleteBook(index) {
-  books.value.splice(index, 1)
+  books.splice(index, 1)
 }
 
 // 编辑逻辑
@@ -52,12 +50,15 @@ function openEditDialog(book) {
 }
 
 function saveEdit() {
-  const index = books.value.findIndex(b => b.id === editedBook.value.id)
+  const index = books.findIndex(b => b.id === editedBook.value.id)
   if (index !== -1) {
-    books.value[index] = { ...editedBook.value }
+    books[index] = { ...editedBook.value }
   }
   editDialogVisible.value = false
 }
+onMounted(() => {
+  console.log(books)
+})
 </script>
 
 <template>
@@ -77,9 +78,30 @@ function saveEdit() {
     <!-- 图书表格 -->
     <el-table :data="filteredBooks" border style="width: 100%">
       <el-table-column prop="id" label="ID" width="80" />
+      <el-table-column prop="1" label="展示图片">
+        <template #default="scope">
+          <!-- <img src="http://localhost:8080/api/d1f51447-fd2f-4a09-b676-78f63e556fa0-屏幕截图 2025-07-10 233515.png" alt="" srcset=""> -->
+          <el-image
+            style="width: 100%; height: 100%"
+            :src="url"
+            :zoom-rate="1.2"
+            :max-scale="7"
+            :min-scale="0.2"
+            show-progress
+            :initial-index="4"
+            fit="contain"
+          />
+        </template>
+      </el-table-column>
       <el-table-column prop="title" label="书名" />
       <el-table-column prop="author" label="作者" />
-      <el-table-column prop="price" label="价格" />
+      <el-table-column prop="price" label="价格" width="80" />
+      <el-table-column prop="1" label="余量" />
+      <el-table-column prop="1" label="出版社" />
+      <el-table-column prop="1" label="状态" />
+      <el-table-column prop="1" label="创建时间" />
+      <el-table-column prop="1" label="更新时间" />
+
       <el-table-column label="操作" width="200">
         <template #default="scope">
           <el-button size="small" @click="openEditDialog(scope.row)">
@@ -93,7 +115,7 @@ function saveEdit() {
     </el-table>
 
     <!-- 添加弹窗 -->
-    <el-dialog v-model="addDialogVisible" title="添加图书">
+    <!-- <el-dialog v-model="addDialogVisible" title="添加图书">
       <el-form :model="newBook" label-width="60px">
         <el-form-item label="书名">
           <el-input v-model="newBook.title" />
@@ -113,8 +135,8 @@ function saveEdit() {
           添加
         </el-button>
       </template>
-    </el-dialog>
-
+    </el-dialog> -->
+    <AddBook />
     <!-- 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" title="编辑图书">
       <el-form :model="editedBook" label-width="60px">
@@ -139,15 +161,18 @@ function saveEdit() {
     </el-dialog>
 
     <!-- 分页 -->
-    <el-pagination
-      style="margin-top: 16px"
-      background
-      :page-sizes="[10, 20, 30, 50]"
-      layout="prev, pager, next"
-      :total="filteredBooks.length"
-      :page-size="pageSize"
-      current-page.sync="currentPage"
-    />
+    <el-affix position="bottom" :offset="20" style="float: right;">
+      <el-pagination
+        v-model:page-size="pageSize"
+        v-model:current-page.sync="currentPage"
+        style="margin-top: 20px;"
+        :page-sizes="[10, 20, 30, 50]"
+        background
+        layout="sizes, prev, pager, next"
+        :total="filteredBooks.length"
+      />
+    </el-affix>
+
     <!-- <el-affix position="bottom" :offset="20" style="float: right;">
         <el-pagination background layout="prev, pager, next" :total="1000" />
   </el-affix> -->
