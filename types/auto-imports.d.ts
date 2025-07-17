@@ -7,7 +7,9 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
+  const ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
   const ElInput: typeof import('element-plus/es')['ElInput']
+  const ElLink: typeof import('element-plus/es')['ElLink']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
@@ -326,7 +328,8 @@ declare module 'vue' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
-    readonly ElInput: UnwrapRef<typeof import('element-plus/es')['ElInput']>
+    readonly ElCheckbox: UnwrapRef<typeof import('element-plus/es')['ElCheckbox']>
+    readonly ElLink: UnwrapRef<typeof import('element-plus/es')['ElLink']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('@vueuse/core')['autoResetRef']>
