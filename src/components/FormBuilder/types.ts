@@ -1,4 +1,4 @@
-import type { CheckboxGroupProps, CheckboxProps, FormItemRule, InputNumberProps, InputProps, RadioProps, SelectProps } from 'element-plus'
+import type { CheckboxGroupProps, CheckboxProps, FormItemRule, FormProps, InputNumberProps, InputProps, RadioProps, SelectProps } from 'element-plus'
 import type { Component, Events } from 'vue'
 import type { ITEM_MAP } from './constant'
 import type { Arrayable, Expand } from '@/types/typeing'
@@ -21,15 +21,15 @@ interface BaseItem {
 //  生成工具类型
 type GenerateProps<K extends keyof typeof ITEM_MAP, P, O extends boolean = false> = (O extends true
   ? {
-      readonly type?: `${K}`
-      props?: Expand<Partial<P & Events>>
-      options: IOptions[]
+    readonly type?: `${K}`
+    props?: Expand<Partial<P & Events>>
+    options: IOptions[]
 
-    }
+  }
   : {
-      readonly type?: `${K}`
-      props?: Expand<Partial<P & Events>>
-    }) & Expand<Partial<P & Events>>
+    readonly type?: `${K}`
+    props?: Expand<Partial<P & Events>>
+  }) & Expand<Partial<P & Events>>
 
 type InputItem = GenerateProps<'input', InputProps>
 
@@ -47,9 +47,8 @@ interface ComponentItem {
   type: Component
 }
 
-export interface IFormProps {
+export type IFormProps = {
   items: TFormItem[]
-  rules: TFormRule
-}
+} & Partial<Omit<FormProps, 'model'>>
 
 export type TFormItem = Expand<BaseItem & (InputItem | SelectItem | RadioItem | CheckboxItem | NumberItem | ComponentItem | CheckboxGroupItem)>

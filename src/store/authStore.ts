@@ -1,5 +1,5 @@
 import type { IRes, IToken } from '../types'
-import type { Login, RegisterParams, UserInfo } from '../types/user'
+import type { ILoginData, IRegisterData, UserInfo } from '../types/user'
 import { ElMessage } from 'element-plus'
 import { getAdminInfo, getUserInfo } from '../api/requestGet'
 import { adminLogin, userLogin, userRegister } from '../api/requestPost'
@@ -8,7 +8,7 @@ import router from '../router'
 export const useUserStore = defineStore('userAuth', () => {
   const registerInfo = ref<IRes<string>>()
   // 用户注册
-  const register = async (info: RegisterParams) => {
+  const register = async (info: IRegisterData) => {
     if (info.nickname == null || info.userId == null || info.password == null || info.checkPassword == null) {
       return ElMessage.error('不能为空')
     }
@@ -25,7 +25,7 @@ export const useUserStore = defineStore('userAuth', () => {
 
   const userData = ref<IRes<IToken>>()
   // 用户登录
-  const login = async (form: Login) => {
+  const login = async (form: ILoginData) => {
     if (form.username == null || form.password == null)
       return ElMessage.error('不能为空')
 
@@ -56,7 +56,7 @@ export const useUserStore = defineStore('userAuth', () => {
 })
 
 export const useAdminStore = defineStore('adminAuth', () => {
-  const login = async (form: Login) => {
+  const login = async (form: ILoginData) => {
     if (form.username == null || form.password == null) {
       ElMessage.error('不能为空')
       return

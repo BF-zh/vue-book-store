@@ -1,12 +1,11 @@
-import type { ResData, Token } from '../types'
-import type { Login, RegisterParams, UserInfo } from '../types/user'
+import type { IRes, IToken, Login, RegisterParams, UserInfo } from '@/types'
 import { ElMessage } from 'element-plus'
-import { getAdminInfo, getUserInfo } from '../api/requestGet'
-import { adminLogin, userLogin, userRegister } from '../api/requestPost'
-import router from '../router'
+import { getAdminInfo, getUserInfo } from '@/api/requestGet'
+import { adminLogin, userLogin, userRegister } from '@/api/requestPost'
+import router from '@/router'
 
 export const useUserStore = defineStore('userAuth', () => {
-  const registerInfo = ref<ResData<string>>()
+  const registerInfo = ref<IRes<string>>()
   // 用户注册
   const register = async (info: RegisterParams) => {
     if (info.nickname == null || info.userId == null || info.password == null || info.checkPassword == null) {
@@ -23,7 +22,7 @@ export const useUserStore = defineStore('userAuth', () => {
     }, 1500)
   }
 
-  const userData = ref<ResData<Token>>()
+  const userData = ref<IRes<IToken>>()
   // 用户登录
   const login = async (form: Login) => {
     if (form.username == null || form.password == null)

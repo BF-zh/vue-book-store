@@ -6,7 +6,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: setupLayouts([{
     path: '/',
-    redirect: { name: 'home' },
+    redirect: { name: 'login' },
   }, ...routes]),
 })
 

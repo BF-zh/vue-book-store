@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import type { AdminLoginParams } from '../types/admin'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAdminStore } from '../store/auth'
+import type { AdminLoginParams } from '@/types'
+import { Setting } from '@element-plus/icons-vue'
 
 definePage({
   name: 'dashboard',
@@ -12,13 +10,13 @@ definePage({
 })
 const adminStore = useAdminStore()
 
-let adminInfo = reactive<AdminLoginParams | object>({})
+const adminInfo = ref<AdminLoginParams>()
 onMounted(async () => {
-  adminInfo = await adminStore.adminInfo() as AdminLoginParams
+  adminInfo.value = await adminStore.adminInfo() as AdminLoginParams
 })
 
 const router = useRouter()
-const activeMenu = ref('books')
+const activeMenu = ref<string>('books')
 
 const menuTitleMap = {
   books: '图书管理',
@@ -40,21 +38,36 @@ function logout() {
 <template>
   <el-container style="height: 100vh">
     <!-- 左侧菜单 -->
-    <el-aside width="200px" style="background: #2d3a4b; color: #fff">
+    <el-aside width="200px" style="background: #001529; color: #bfcbd9">
       <div class="logo">
         📚 书店后台
       </div>
       <el-menu
+        router
         :default-active="activeMenu"
         class="el-menu-vertical-demo"
-        background-color="#2d3a4b"
-        text-color="#fff"
+        background-color="#001529"
+        text-color="#bfcbd9"
         active-text-color="#409EFF"
         @select="handleMenuSelect"
       >
-        <el-menu-item route="/dashboard/books" index="books">
+        <el-sub-menu index="1">
+          <template #title>
+            📘
+            <span> 图书管理</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item route="/dashboard/bookManager" index="books">
+              图书列表
+            </el-menu-item>
+            <el-menu-item route="/dashboard/addBook" index="1-2">
+              添加图书
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+        <!-- <el-menu-item route="/dashboard/bookManager" index="books">
           📘 图书管理
-        </el-menu-item>
+        </el-menu-item> -->
         <el-menu-item route="/dashboard/users" index="users">
           👥 用户管理
         </el-menu-item>
@@ -69,13 +82,29 @@ function logout() {
 
     <!-- 主体内容 -->
     <el-container>
-      <el-header style="background: #2d3a4b; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
-        <div class="text-lightBlue">
+      <el-header style="background: #F0F8FF; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+        <div>
           当前模块：{{ menuTitleMap[activeMenu] }}
         </div>
-        <el-button type="danger" size="small" @click="logout">
+        <!-- <el-button type="danger" size="small" @click="logout">
           退出登录
-        </el-button>
+        </el-button> -->
+        <el-dropdown>
+          <span class="el-dropdown-link">
+            管理员{{ adminInfo?.adminName }}你好!
+            <el-icon class="el-icon--right">
+              <!-- <ArrowDown /> -->
+              <Setting />
+            </el-icon>
+          </span>
+          <template #dropdown>
+            <!-- <el-dropdown-menu>
+            </el-dropdown-menu> -->
+            <el-button type="danger" size="small" @click="logout">
+              退出登录
+            </el-button>
+          </template>
+        </el-dropdown>
       </el-header>
       <el-main>
         <!-- <div v-if="activeMenu === 'books'">📘 图书管理页面（可展示表格）</div>
@@ -94,5 +123,11 @@ function logout() {
   font-weight: bold;
   padding: 20px;
   text-align: center;
+}
+.example-showcase .el-dropdown-link {
+  cursor: pointer;
+  color: var(--el-color-primary);
+  display: flex;
+  align-items: center;
 }
 </style>
