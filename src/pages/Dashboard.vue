@@ -12,7 +12,7 @@ const adminStore = useAdminStore()
 
 const adminInfo = ref<AdminLoginParams>()
 onMounted(async () => {
-  adminInfo.value = await adminStore.adminInfo() as AdminLoginParams
+  // adminInfo.value = await adminStore.adminInfo() as AdminLoginParams
 })
 
 const router = useRouter()

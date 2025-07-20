@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { UploadProps } from 'element-plus'
+import type { UploadProps, UploadUserFile } from 'element-plus'
 import type { IBooks } from '@/types'
-import { Plus } from '@element-plus/icons-vue'
+import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue'
+import http from '@/utils/request'
 
 const form = reactive<IBooks>({
   bookId: '',
@@ -14,35 +15,92 @@ const form = reactive<IBooks>({
   bookStatus: 1,
 })
 
-const imageUrl = ref('')
+// const imageUrl = ref('')
 
-const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+// const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
+//   imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+// }
+
+// const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+// //   if (rawFile.type !== 'image/jpeg') {
+// //     ElMessage.error('Avatar picture must be JPG format!')
+//   console.log(rawFile)
+//   //     return false
+//   //   }
+//   //   else if (rawFile.size / 1024 / 1024 > 2) {
+//   //     ElMessage.error('Avatar picture size can not exceed 2MB!')
+//   //     return false
+//   //   }
+//   // imageUrl.value = URL.createObjectURL(rawFile)
+
+//   return true
+// }
+// const dialogImageUrl = ref('')
+// const dialogVisible = ref(false)
+
+// const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
+//   dialogImageUrl.value = uploadFile.url!
+//   dialogVisible.value = true
+// }
+const imagePreview = ref<string[]>() // 图片预览
+const fileInput = ref() // 文件输入
+const modalVisible = ref(false) // 模态框显示状态
+
+// 触发文件选择
+function triggerFileInput() {
+  fileInput.value.click()
+  console.log(fileInput)
 }
 
-const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-//   if (rawFile.type !== 'image/jpeg') {
-//     ElMessage.error('Avatar picture must be JPG format!')
-//     console.log(rawFile)
-//     return false
-//   }
-//   else if (rawFile.size / 1024 / 1024 > 2) {
-//     ElMessage.error('Avatar picture size can not exceed 2MB!')
-//     return false
-//   }
-  return true
+// 处理文件选择
+function handleFileChange(event: any) {
+  const file = event.target.files[0]
+  if (file && file.type.startsWith('image/')) {
+    // 创建图片预览
+    // const reader = new FileReader()
+    // reader.onload = () => {
+    //   imagePreview.value = reader.result
+    // }
+    // reader.readAsDataURL(file)
+    imagePreview.value?.push(file)
+  }
+  else {
+    alert('请上传有效的图片文件')
+  }
+}
+const headers = { 'Content-Type': 'multipart/form-data' }
+// 上传图片 (这里只是一个模拟方法，你可以替换为实际的上传逻辑)
+function uploadImage() {
+  const formData = new FormData()
+  formData.append('files', fileInput.value.files[0])
+  const res = http.post('/download', formData, { headers })
+  console.log(res)
+
+  // alert('图片已上传！')
+  // // 清空选择的图片
+  // imagePreview.value = null
+}
+
+// 打开模态框显示大图
+function openModal() {
+  modalVisible.value = true
+}
+
+// 关闭模态框
+function closeModal() {
+  modalVisible.value = false
 }
 </script>
 
 <template>
-  <el-form :model="form" style="max-width: 600px; display: flex; flex-direction: column; justify-content: center;">
+  <el-form :model="form" style="max-width: 600px; display: flex; flex-direction: column; justify-content: center;" @submit.prevent>
     <el-form-item label="书&emsp;&emsp;名">
       <el-input v-model="form.bookName" />
     </el-form-item>
     <el-form-item label="作&emsp;&emsp;者">
       <el-input v-model="form.bookWriter" />
     </el-form-item>
-    <el-form-item label="出&emsp;版&emsp;社">
+    <el-form-item label="出&nbsp;&nbsp;版&nbsp;&nbsp;社">
       <el-input v-model="form.bookPress" />
     </el-form-item>
     <el-form-item label="数&emsp;&emsp;量">
@@ -56,19 +114,46 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
       </el-input-number>
     </el-form-item>
     <el-form-item label="展示图片">
-      <el-upload
-        class="avatar-uploader"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-        :show-file-list="false"
-        :on-success="handleAvatarSuccess"
-        :before-upload="beforeAvatarUpload"
-        :auto-upload="false"
-      >
-        <img v-if="imageUrl" :src="imageUrl" class="avatar">
-        <el-icon v-else class="avatar-uploader-icon">
-          <Plus />
-        </el-icon>
-      </el-upload>
+      <div class="image-upload">
+        <input
+          ref="fileInput"
+          type="file"
+          accept="image/*"
+          hidden
+          @change="handleFileChange"
+        >
+        <ElButton @click="triggerFileInput">
+          选择图片
+        </ElButton>
+
+        <div
+          v-for=" (items, index) in imagePreview"
+          :key="index" class="image-preview h-200px w-150px relative"
+        >
+          <!-- 点击预览图显示大图 -->
+          <img
+            :key="index"
+            :src="items"
+            class="h-full w-full"
+            alt="image preview"
+            @click="openModal"
+          >
+          <span class="right-0 top-0 absolute">
+            <el-icon>
+              <Delete />
+            </el-icon>
+          </span>
+        </div>
+
+        <!-- 模态框显示大图 -->
+        <div v-if="modalVisible" class="modal" @click="closeModal">
+          <img :src="imagePreview" alt="image preview" class="modal-image">
+        </div>
+
+        <button v-if="imagePreview" @click="uploadImage">
+          上传图片
+        </button>
+      </div>
     </el-form-item>
     <el-form-item label="是否上架">
       <el-radio-group v-model="form.bookStatus">
@@ -92,29 +177,42 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 </template>
 
 <style scoped>
-.avatar-uploader .el-upload {
-  border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: cover;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: var(--el-transition-duration-fast);
+  transition: transform 0.2s;
 }
 
-.avatar-uploader .el-upload:hover {
-  border-color: var(--el-color-primary);
+.image-preview img:hover {
+  transform: scale(1.1);
 }
 
-.el-icon.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  text-align: center;
+/* 模态框样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
-.avatar-uploader .avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
+
+.modal-image {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
 }
 </style>
