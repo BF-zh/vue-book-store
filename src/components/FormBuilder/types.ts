@@ -1,4 +1,4 @@
-import type { CheckboxGroupProps, CheckboxProps, FormItemRule, FormProps, InputNumberProps, InputProps, RadioProps, SelectProps } from 'element-plus'
+import type { CheckboxGroupProps, CheckboxProps, FormItemRule, FormProps, InputNumberProps, InputProps, RadioProps, SelectProps, SwitchProps } from 'element-plus'
 import type { Component, Events } from 'vue'
 import type { ITEM_MAP } from './constant'
 import type { Arrayable, Expand } from '@/types/typeing'
@@ -43,6 +43,8 @@ type CheckboxGroupItem = GenerateProps<'checkboxGroup', CheckboxGroupProps, true
 
 type NumberItem = GenerateProps<'number', InputNumberProps>
 
+type SwitchItem = GenerateProps<'switch', SwitchProps>
+
 interface ComponentItem {
   type: Component
 }
@@ -51,4 +53,4 @@ export type IFormProps = {
   items: TFormItem[]
 } & Partial<Omit<FormProps, 'model'>>
 
-export type TFormItem = Expand<BaseItem & (InputItem | SelectItem | RadioItem | CheckboxItem | NumberItem | ComponentItem | CheckboxGroupItem)>
+export type TFormItem = Expand<BaseItem & (InputItem | SelectItem | RadioItem | CheckboxItem | NumberItem | ComponentItem | CheckboxGroupItem | SwitchItem)>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { RegisterParams } from '@/types'
+import type { IRegisterData } from '@/types'
 import { ElMessage } from 'element-plus'
 
 const userStore = useUserStore()
@@ -9,7 +9,7 @@ definePage({
     isPublic: true,
   },
 })
-const regForm = reactive<RegisterParams>({
+const regForm = reactive<IRegisterData>({
   nickname: '',
   userId: '',
   password: '',

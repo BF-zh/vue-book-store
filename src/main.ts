@@ -6,7 +6,6 @@ import router from './router'
 import 'uno.css'
 import '@unocss/reset/tailwind.css'
 import './assets/styles/reset.css'
-import 'element-plus/dist/index.css'
 
 const pinia = createPinia()
 pinia.use(persistedstate)

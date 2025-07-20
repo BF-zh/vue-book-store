@@ -6,7 +6,7 @@ const userInfo = ref<UserInfo>()
 definePage({
   name: 'home',
   meta: {
-    isPublic: true,
+    // isPublic: true,
   },
 })
 

@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import type { AdminLoginParams } from '@/types'
+import type { AdminLoginData } from '@/types'
 import { Setting } from '@element-plus/icons-vue'
 
 definePage({
   name: 'dashboard',
   meta: {
-    isPublic: false,
+    isPublic: true,
+    layout: 'admin',
+    isAdmin:true
   },
 })
+
 const adminStore = useAdminStore()
 
-const adminInfo = ref<AdminLoginParams>()
+const adminInfo = ref<AdminLoginData>()
 onMounted(async () => {
-  adminInfo.value = await adminStore.adminInfo() as AdminLoginParams
+  // adminInfo.value = await adminStore.adminInfo() as AdminLoginParams
 })
 
 const router = useRouter()

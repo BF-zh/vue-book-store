@@ -1,120 +1,145 @@
 <script setup lang="ts">
-import type { UploadProps } from 'element-plus'
-import type { IBooks } from '@/types'
-import { Plus } from '@element-plus/icons-vue'
+import type { UploadUserFile } from 'element-plus'
+import type { TBookData } from '@/types'
+import { defineFormItem } from '@/components/FormBuilder'
 
-const form = reactive<IBooks>({
-  bookId: '',
-  bookName: '',
-  bookMoney: 0,
-  bookNum: 0,
-  bookWriter: '',
-  bookPress: '',
-  createTime: new Date().toLocaleString(),
-  bookStatus: 1,
+definePage({
+  name: 'add-book',
+  meta: {
+    // isPublic: true,
+  },
 })
 
-const imageUrl = ref('')
+const formData = reactive<TBookData>({
+  bookName: '',
+  bookMoney: 0,
+  bookWriter: '',
+  bookPress: '',
+  bookStatus: 1,
+  bookNum: 0,
+  files: [],
+})
 
-const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
-}
+const formInstance = useTemplateRef('formRef')
 
-const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-//   if (rawFile.type !== 'image/jpeg') {
-//     ElMessage.error('Avatar picture must be JPG format!')
-//     console.log(rawFile)
-//     return false
-//   }
-//   else if (rawFile.size / 1024 / 1024 > 2) {
-//     ElMessage.error('Avatar picture size can not exceed 2MB!')
-//     return false
-//   }
-  return true
+const formItem = defineFormItem(() => [
+  {
+    key: 'bookName',
+    label: '书名',
+    rules: [
+      {
+        required: true,
+        message: '书名不能为空',
+      },
+    ],
+  },
+  {
+    key: 'bookWriter',
+    label: '作者',
+    rules: [{
+      required: true,
+      message: '作者不能为空',
+    }],
+  },
+  {
+    key: 'bookPress',
+    label: '出版社',
+    rules: [{
+      required: true,
+      message: '出版社不能为空',
+    }],
+  },
+  {
+    key: 'bookNum',
+    type: 'number',
+    label: '数量',
+    rules: [{
+      required: true,
+      message: '数量不能为空',
+    }],
+  },
+  {
+    key: 'bookMoney',
+    type: 'number',
+    label: '价格',
+    rules: [{
+      required: true,
+      message: '价格不能为空',
+    }],
+  },
+  {
+    key: 'bookStatus',
+    label: '是否上架',
+    type: 'switch',
+    activeValue: 1,
+    inactiveValue: 0,
+  },
+  {
+    key: 'files',
+    label: '展示图片',
+    rules: [
+      {
+        validator(_, value: UploadUserFile[], callback) {
+          if (value && value.length >= 1)
+            return callback()
+          callback('请选择图片')
+        },
+        required: true,
+        message: '请选择展示图片',
+      },
+    ],
+  },
+])
+async function submitUpload() {
+  try {
+    await formInstance.value?.validate()
+    const { files } = formData
+    const fd = new FormData()
+    files.forEach(({ raw }) => {
+      raw && fd.append('files', raw)
+    })
+    fd.append('bookName', formData.bookName)
+    fd.append('bookMoney', String(formData.bookMoney))
+    fd.append('bookWriter', formData.bookWriter)
+    fd.append('bookPress', formData.bookPress)
+    fd.append('bookStatus', String(formData.bookStatus))
+    fd.append('bookNum', String(formData.bookNum))
+  }
+  catch {
+    console.log('error')
+  }
 }
 </script>
 
 <template>
-  <el-form :model="form" style="max-width: 600px; display: flex; flex-direction: column; justify-content: center;">
-    <el-form-item label="书&emsp;&emsp;名">
-      <el-input v-model="form.bookName" />
-    </el-form-item>
-    <el-form-item label="作&emsp;&emsp;者">
-      <el-input v-model="form.bookWriter" />
-    </el-form-item>
-    <el-form-item label="出&emsp;版&emsp;社">
-      <el-input v-model="form.bookPress" />
-    </el-form-item>
-    <el-form-item label="数&emsp;&emsp;量">
-      <el-input-number v-model="form.bookNum" />
-    </el-form-item>
-    <el-form-item label="价&emsp;&emsp;格">
-      <el-input-number v-model="form.bookMoney">
-        <template #suffix>
-          <span>RMB</span>
-        </template>
-      </el-input-number>
-    </el-form-item>
-    <el-form-item label="展示图片">
+  <FormBuilder ref="formRef" v-model="formData" label-width="100" scroll-to-error :items="formItem" label-suffix="：" class="w-lg">
+    <template #files>
       <el-upload
-        class="avatar-uploader"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-        :show-file-list="false"
-        :on-success="handleAvatarSuccess"
-        :before-upload="beforeAvatarUpload"
+        v-model:file-list="formData.files"
         :auto-upload="false"
+        drag
+        accept="image/*"
+        multiple
+        class="w-full"
       >
-        <img v-if="imageUrl" :src="imageUrl" class="avatar">
-        <el-icon v-else class="avatar-uploader-icon">
-          <Plus />
-        </el-icon>
+        <div>
+          <i class="i-ep:upload-filled c-gray size-2em" />
+          <div>
+            Drop file here or <em>click to upload</em>
+          </div>
+        </div>
+
+        <template #tip>
+          <div class="text-center">
+            jpg/png 格式的文件 且大小不超过 5M
+          </div>
+        </template>
       </el-upload>
-    </el-form-item>
-    <el-form-item label="是否上架">
-      <el-radio-group v-model="form.bookStatus">
-        <el-radio value="1">
-          上架
-        </el-radio>
-        <el-radio value="0">
-          不上架
-        </el-radio>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary">
-        添加
-      </el-button>
-      <el-button>
-        清空
-      </el-button>
-    </el-form-item>
-  </el-form>
+    </template>
+  </FormBuilder>
+  <div>
+    <el-button @click="() => submitUpload()">
+      提交
+    </el-button>
+  </div>
 </template>
-
-<style scoped>
-.avatar-uploader .el-upload {
-  border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: var(--el-transition-duration-fast);
-}
-
-.avatar-uploader .el-upload:hover {
-  border-color: var(--el-color-primary);
-}
-
-.el-icon.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  text-align: center;
-}
-.avatar-uploader .avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-}
-</style>

@@ -8,7 +8,3 @@ export interface IRes<T> {
   /* 响应数据 */
   data: T
 }
-
-export interface IToken {
-  token: string
-}

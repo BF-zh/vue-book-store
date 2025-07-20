@@ -1,58 +1,51 @@
-import type { IRes, IToken } from '../types'
-import type { ILoginData, IRegisterData, UserInfo } from '../types/user'
+
+import type { ILoginData } from '../types/user'
 import { ElMessage } from 'element-plus'
-import { getAdminInfo, getUserInfo } from '../api/requestGet'
-import { adminLogin, userLogin, userRegister } from '../api/requestPost'
+import { getAdminInfo } from '../api/requestGet'
+import { adminLogin } from '../api/requestPost'
 import router from '../router'
 
-export const useUserStore = defineStore('userAuth', () => {
-  const registerInfo = ref<IRes<string>>()
-  // 用户注册
-  const register = async (info: IRegisterData) => {
-    if (info.nickname == null || info.userId == null || info.password == null || info.checkPassword == null) {
-      return ElMessage.error('不能为空')
-    }
-    registerInfo.value = await userRegister(info)
-    if (registerInfo.value.code !== 200) {
-      ElMessage.error(registerInfo.value.message)
-      return
-    }
-    ElMessage.success(registerInfo.value.message)
-    setTimeout(() => {
-      router.push('/Login')
-    }, 1500)
+const __USER_AUTH__ = '__USER_AUTH__'
+
+interface ITokens {
+  admin: string
+  user: string
+}
+
+export const useAuthStore = defineStore('userAuth', () => {
+  const tokens = reactive<ITokens>({
+    user: '',
+    admin: '',
+  })
+
+  const isAdmin = ref(false)
+
+  const setToken = (token: string, type: keyof ITokens) => {
+    isAdmin.value = type === 'admin'
+    tokens[type] = token
   }
 
-  const userData = ref<IRes<IToken>>()
-  // 用户登录
-  const login = async (form: ILoginData) => {
-    if (form.username == null || form.password == null)
-      return ElMessage.error('不能为空')
+  const token = ref('')
+  const cToken = computed(() => {
+    return isAdmin.value ? tokens.admin : tokens.user
+  })
 
-    userData.value = await userLogin(form)
-    if (userData.value.code !== 200) {
-      ElMessage.error(userData.value.message)
-      return
-    }
-    const token = userData.value.data.token
-    localStorage.setItem('token', token)
-    ElMessage.success('登录成功')
-    setTimeout(() => {
-      router.push('/Home')
-    }, 1500)
+  watch(cToken, (val) => {
+    token.value = val
+  })
+  const isAuthenticated = computed(() => !!token.value)
+  return {
+    setToken,
+    isAdmin,
+    token,
+    isAuthenticated,
   }
-  // 获取用户信息
-  const userInfo = async (): Promise<UserInfo> => {
-    const res = await getUserInfo()
-    if (res.code !== 200) {
-      // ElMessage.error(res.message)
-      localStorage.removeItem('token')
-      // return
-    }
-
-    return res.data
-  }
-  return { register, login, registerInfo, userInfo }
+}, {
+  persist: {
+    key: __USER_AUTH__,
+    pick: ['isAdmin', 'token'],
+    storage: localStorage,
+  },
 })
 
 export const useAdminStore = defineStore('adminAuth', () => {

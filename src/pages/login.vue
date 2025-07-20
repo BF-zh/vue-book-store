@@ -42,10 +42,10 @@ const formItems = defineFormItem(() => [
         max: 16,
         message: '账号长度为6-16位',
       },
-      {
-        pattern: /^(?=.*[A-Z])(?=.*\d)[A-Z\d]{6,}$/i,
-        message: '必须包含至少一个字母和一个数字',
-      },
+      // {
+      //   pattern: /^(?=.*[A-Z])(?=.*\d)[A-Z\d]{6,}$/i,
+      //   message: '必须包含至少一个字母和一个数字',
+      // },
     ],
   },
   {

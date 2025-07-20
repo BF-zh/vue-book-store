@@ -142,11 +142,10 @@ export const useRequest = createRequest({
     return status >= 200 && status < 500
   },
   beforeRequest(config) {
-    // const { token } = useAuthStore()
-    // console.log({ token })
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`
-    // }
+    const { token } = useAuthStore()
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
     return config
   },
   afterRequest(result) {
