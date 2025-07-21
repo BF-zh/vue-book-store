@@ -2,7 +2,7 @@ import type { ILoginData, IRegisterData, IToken } from '@/types'
 
 //  用户登录 type = user 即普通用户 admin 即管理员
 export function login({ type, ...data }: ILoginData) {
-  return useRequest<IToken>(`/${type}/login`, {
+  return useRequest<IToken, Omit<ILoginData, 'type'>>(`/${type}/login`, {
     method: 'POST',
     data,
   })
