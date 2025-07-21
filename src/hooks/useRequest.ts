@@ -9,29 +9,29 @@ type DefaultRequestOptions = Expand<CreateAxiosDefaults> & {
   afterRequest?: (result: AxiosResponse) => AxiosResponse
 }
 
-interface RequestParams {
+interface RequestParams<T = any> {
   method?: Method
   url?: ShallowRef<string> | string
   params?: Record<string, any>
   immediate?: boolean
   watch?: boolean | (() => boolean)
-  data?: ShallowRef<unknown | null> | unknown
+  data?: ShallowRef<T | null> | T
   headers?: AxiosRequestHeaders
   done?: () => void
   error?: (error: any) => void
 }
 
-type RequestOptions = Expand<RequestParams>
-type RequestExecuteOptions = Pick<RequestOptions, 'data' | 'params' | 'method' | 'url'>
+// type RequestOptions = Expand<RequestParams>
+type RequestExecuteOptions<T> = Pick<RequestParams<T>, 'data' | 'params' | 'method' | 'url'>
 
-interface RequestResult<D = unknown> {
-  data: ShallowRef<D | null>
+interface RequestResult<R = unknown, D = any> {
+  data: ShallowRef<R | null>
   status: ShallowRef<number>
   request: ShallowRef<XMLHttpRequest | null>
   response: ShallowRef<Response | null>
   loading: ShallowRef<boolean>
   refresh: () => void
-  execute: <T>(options?: RequestExecuteOptions) => Promise<T>
+  execute: (options?: RequestExecuteOptions<D>) => Promise<R>
   abort: () => void
 }
 
@@ -52,26 +52,26 @@ export function createRequest(options: DefaultRequestOptions) {
     return Promise.reject(error)
   })
 
-  return <D = any>(url: ShallowRef<string> | string, options?: RequestOptions): RequestResult<D> => {
+  return <R = any, D = any>(url: ShallowRef<string> | string, options?: RequestParams<D>): RequestResult<R, D> => {
     const allOptions = {
       ...defaultOptions,
       ...options,
     }
     const { method, params, data, headers, immediate, watch: watchRef, done, error } = allOptions
-    const _data = shallowRef<D | null>(null)
+    const _data = shallowRef<R | null>(null)
     const status = shallowRef<number>(0)
     const request = shallowRef<XMLHttpRequest | null>(null)
     const response = shallowRef<Response | null>(null)
     const loading = shallowRef<boolean>(false)
 
-    const execute = async <T>(o?: RequestExecuteOptions) => {
+    const execute = async (o?: RequestExecuteOptions<D>) => {
       const options = {
         ...allOptions,
         ...o,
       }
       try {
         loading.value = true
-        const res = await https.request<T>({
+        const res = await https.request<R>({
           method,
           params,
           data,
@@ -82,7 +82,7 @@ export function createRequest(options: DefaultRequestOptions) {
         })
         _data.value = res
         status.value = res.status
-        return res as T
+        return res as R
       }
       catch (err) {
         error?.(err)
@@ -90,7 +90,7 @@ export function createRequest(options: DefaultRequestOptions) {
           data: null,
           status: 502,
           message: '请求失败',
-        } as T
+        } as R
       }
       finally {
         loading.value = false
