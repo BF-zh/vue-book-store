@@ -42,7 +42,7 @@ const form = reactive<IBooks>({
 //   dialogImageUrl.value = uploadFile.url!
 //   dialogVisible.value = true
 // }
-const imagePreview = ref<string[]>() // 图片预览
+const imagePreview = ref() // 图片预览
 const fileInput = ref() // 文件输入
 const modalVisible = ref(false) // 模态框显示状态
 
@@ -62,7 +62,7 @@ function handleFileChange(event: any) {
     //   imagePreview.value = reader.result
     // }
     // reader.readAsDataURL(file)
-    imagePreview.value?.push(file)
+    imagePreview.value = URL.createObjectURL(file)
   }
   else {
     alert('请上传有效的图片文件')
@@ -122,18 +122,14 @@ function closeModal() {
           hidden
           @change="handleFileChange"
         >
-        <ElButton @click="triggerFileInput">
+        <ElButton ty @click="triggerFileInput">
           选择图片
         </ElButton>
 
-        <div
-          v-for=" (items, index) in imagePreview"
-          :key="index" class="image-preview h-200px w-150px relative"
-        >
+        <div v-if="imagePreview" class="image-preview h-200px w-150px relative">
           <!-- 点击预览图显示大图 -->
           <img
-            :key="index"
-            :src="items"
+            :src="imagePreview"
             class="h-full w-full"
             alt="image preview"
             @click="openModal"

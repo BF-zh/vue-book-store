@@ -76,7 +76,11 @@ onMounted(() => {
     </el-button>
 
     <!-- 图书表格 -->
-    <el-table :data="filteredBooks" border style="width: 100%">
+    <el-table
+      :data="filteredBooks"
+
+      style="width: 100%"
+    >
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="1" label="展示图片">
         <template #default="scope">

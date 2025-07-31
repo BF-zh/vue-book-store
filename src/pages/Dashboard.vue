@@ -12,9 +12,8 @@ const adminStore = useAdminStore()
 
 const adminInfo = ref<AdminLoginParams>()
 onMounted(async () => {
-  // adminInfo.value = await adminStore.adminInfo() as AdminLoginParams
+  adminInfo.value = await adminStore.adminInfo() as AdminLoginParams
 })
-
 const router = useRouter()
 const activeMenu = ref<string>('books')
 
@@ -57,6 +56,7 @@ function logout() {
             <span> 图书管理</span>
           </template>
           <el-menu-item-group>
+            <template #title />
             <el-menu-item route="/dashboard/bookManager" index="books">
               图书列表
             </el-menu-item>
@@ -68,6 +68,9 @@ function logout() {
         <!-- <el-menu-item route="/dashboard/bookManager" index="books">
           📘 图书管理
         </el-menu-item> -->
+        <el-menu-item route="/dashboard/users" index="users">
+          👥 用户管理
+        </el-menu-item>
         <el-menu-item route="/dashboard/users" index="users">
           👥 用户管理
         </el-menu-item>
