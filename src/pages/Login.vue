@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import type { Login } from '@/types'
+import type { ILoginData } from '@/types'
+import { UserApi } from '@/api'
+import { defineFormItem } from '@/components/FormBuilder'
 
 definePage({
   name: 'login',
@@ -7,73 +9,100 @@ definePage({
     isPublic: true,
   },
 })
-const adminAuth = useAdminStore()
-const usersAuth = useUserStore()
-const form = reactive<Login>({
-  username: '',
+
+const formData = reactive<ILoginData>({
   password: '',
+  username: '',
+  type: 'users',
 })
-
-const value = ref(0)
-const options = [
+const { data, execute, loading } = UserApi.login(formData)
+const formItems = defineFormItem(() => [
   {
-    value: 0,
-    label: '用户',
+    key: 'username',
+    label: '账号',
+    placeholder: '请输入账号',
+    rules: [
+      {
+        required: true,
+        message: '账号不能为空',
+      },
+    ],
   },
   {
-    value: 1,
-    label: '管理员',
+    key: 'password',
+    label: '密码',
+    placeholder: '请输入密码',
+    rules: [
+      {
+        required: true,
+        message: '密码不能为空',
+      },
+      {
+        min: 6,
+        max: 16,
+        message: '账号长度为6-16位',
+      },
+      {
+        pattern: /^(?=.*[A-Z])(?=.*\d)[A-Z\d]{6,}$/i,
+        message: '必须包含至少一个字母和一个数字',
+      },
+    ],
   },
-]
-const rememberMe = ref(false)
+  {
+    key: 'type',
+    label: '身份',
+    type: 'select',
+    placeholder: '请选择身份',
+    defaultFirstOption: true,
+    rules: { required: true, message: '身份不能为空' },
+    options: [
+      {
+        label: '用户',
+        value: 'users',
+      },
+      {
+        label: '管理员',
+        value: 'admin',
+      },
+    ],
+  },
+])
 
-async function handleLogin() {
-  if (value.value) {
-    await adminAuth.login(form)
-    return
+const formInstance = useTemplateRef('formRef')
+
+async function onSubmit() {
+  try {
+    await formInstance.value?.validate()
+    execute({ data: formData })
   }
-  await usersAuth.login(form)
+  catch (e) {
+    // console.log('验证失败', e)
+  }
 }
 </script>
 
 <template>
-  <div class="login-page">
-    <div class="login-box">
-      <h2>网上书店商城</h2>
-      <form @submit.prevent="handleLogin">
-        <div class="form-row">
-          <label for="username">账&emsp;号</label>
-          <input id="username" v-model="form.username" required>
-        </div>
-
-        <div class="form-row">
-          <label for="password">密&emsp;码</label>
-          <input id="password" v-model="form.password" type="password" required>
-        </div>
-        <div class="form-row">
-          <label for="">身&emsp;份</label>
-          <el-select v-model="value" filterable placeholder="Select" style="width: 240px">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </div>
-        <div class="options">
-          <label><input v-model="rememberMe" type="checkbox"> 记住我</label>
-          <a href="#">忘记密码？</a>
-        </div>
-
-        <button class="login-button" type="submit">
+  <div class="flex h-full w-full items-center justify-center">
+    {{ data }}
+    <el-card class="max-w-400px">
+      <h2 class="mb-sm text-center">
+        网上书店商城
+      </h2>
+      <form-builder ref="formRef" v-model="formData" :items="formItems" label-width="70" label-suffix="：" scroll-to-error />
+      <div class="flex justify-between">
+        <el-checkbox>记住我</el-checkbox>
+        <el-link type="primary">
+          忘记密码
+        </el-link>
+      </div>
+      <div class="gap-sm flex flex-col">
+        <el-button size="large" :loading="loading" @click="onSubmit">
           登录
-        </button>
-        <p class="switch-link">
-          还没有账号？<router-link to="/register">
-            去注册
-          </router-link>
-        </p>
-      </form>
-    </div>
+        </el-button>
+        <el-link type="default">
+          还没有账号？去注册
+        </el-link>
+      </div>
+    </el-card>
   </div>
 </template>
-
-<style scoped>
-@import '../assets/css/LoginRegisterCommon.css';
-</style>

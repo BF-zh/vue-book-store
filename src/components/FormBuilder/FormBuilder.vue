@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import type { FormInstance, FormItemRule } from 'element-plus'
 import type { IFormProps, IOptions, TFormItem, TFormRule } from './types'
-import { isEqual, omit } from 'lodash-es'
+import { omit } from 'lodash-es'
 import { ITEM_MAP, OPTIONS_MAP } from './constant'
 
 const props = defineProps<IFormProps>()
 const modelValue = defineModel<Record<string, any>>({ default: {} })
+
+const formProps = computed(() => {
+  return omit(Object.fromEntries(Object.entries(props).filter(([_, val]) => val)), ['modelValue', 'items'])
+})
+
 const rootKey = ['key', 'type', 'label', 'props'] as const
-function getProps(item: TFormItem) {
+function getItemProps(item: TFormItem) {
   if (item.type && typeof item.type !== 'string') {
     return
   }
@@ -80,12 +85,12 @@ const mergedRules = computed(() => {
 </script>
 
 <template>
-  <el-form ref="formRef" :model="modelValue" :rules="mergedRules">
+  <el-form ref="formRef" :model="modelValue" v-bind="{ ...formProps, rules: mergedRules }">
     <el-row :gutter="24" justify="space-between">
       <el-col v-for="item in props.items" :key="item.key" :gutter="24" :span="item.span || 24">
         <el-form-item v-if="!item.hidden" :label="item.label" :prop="item.key">
-          <slot :name="item.key" :data="modelValue[item.key]" :props="getProps(item)" :item="item">
-            <component :is="getComponent(item)" v-bind="getProps(item)" v-model="modelValue[item.key]">
+          <slot :name="item.key" :data="modelValue[item.key]" :props="getItemProps(item)" :item="item">
+            <component :is="getComponent(item)" v-bind="getItemProps(item)" v-model="modelValue[item.key]">
               <Component :is="getOptions(item)" v-for="option in getOptionsData(item)" :key="option.value" :label="option.label" :value="option.value" />
             </component>
           </slot>

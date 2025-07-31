@@ -129,6 +129,7 @@ export function createRequest(options: DefaultRequestOptions) {
 }
 
 const __BASE_URL__ = import.meta.env.VITE_API_URL || 'http://localhost:8888'
+console.log(__BASE_URL__)
 
 // const ErrorCode = [HttpStatus.USER_NOT_FOUND, HttpStatus.PASSWORD_ERROR, HttpStatus.USER_DISABLED]
 
@@ -136,7 +137,7 @@ export const useRequest = createRequest({
   baseURL: __BASE_URL__,
   timeout: 20000,
   responseType: 'json',
-  withCredentials: true,
+  // withCredentials: true,
   validateStatus(status) {
     return status >= 200 && status < 500
   },

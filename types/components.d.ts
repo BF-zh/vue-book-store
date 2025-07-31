@@ -9,9 +9,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddBook: typeof import('./../src/components/AddBook.vue')['default']
-    BfForm: typeof import('./../src/components/bf/bf-form.vue')['default']
-    BfFormBuilder: typeof import('./../src/components/BfFormBuilder.vue')['default']
-    BFFormBuilder: typeof import('./../src/components/BFFormBuilder.vue')['default']
     ElAffix: typeof import('element-plus/es')['ElAffix']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']

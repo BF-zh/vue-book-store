@@ -1,16 +1,16 @@
 import type { IRes, IToken } from '../types'
-import type { Login, RegisterParams } from '../types/user'
+import type { IAdminLoginData, IRegisterData, IUserLoginData } from '../types/user'
 import http from '../utils/request'
 
-export async function userRegister(register: RegisterParams): Promise<IRes<''>> {
+export async function userRegister(register: IRegisterData): Promise<IRes<''>> {
   return await http.post('/users/register', register)
 }
 
-export async function userLogin(info: Login): Promise<IRes<IToken>> {
-  return await http.post('/users/login', { userId: info.username, password: info.password })
+export async function userLogin(info: IUserLoginData): Promise<IRes<IToken>> {
+  return await http.post('/users/login', info)
 }
 
-export async function adminLogin(info: Login): Promise<IRes<IToken>> {
-  return await http.post('/admin/login', { adminId: info.username, password: info.password },
+export async function adminLogin(info: IAdminLoginData): Promise<IRes<IToken>> {
+  return await http.post('/admin/login', info,
   )
 }

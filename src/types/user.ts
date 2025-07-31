@@ -1,7 +1,14 @@
 // 登录的需要的参数
-export interface Login {
+export interface ILoginData {
+  /** 账号 */
   username: string
+  /** 密码 */
   password: string
+  type: 'users' | 'admin'
+}
+
+export interface IToken {
+  token: string
 }
 
 // 用户信息
@@ -38,7 +45,7 @@ export interface UserInfo {
 }
 
 // 注册需要的参数
-export interface RegisterParams {
+export interface IRegisterData {
   /* 昵称 */
   nickname: string
 
@@ -50,4 +57,15 @@ export interface RegisterParams {
 
   /* 确认密码 */
   checkPassword: string
+}
+
+export interface AdminLoginData {
+  /* 管理员账号 */
+  adminId: string
+
+  /* 管理员密码 */
+  password: string
+
+  /* 管理员名字 */
+  adminName: string
 }
