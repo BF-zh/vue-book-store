@@ -50,7 +50,7 @@ export interface IRegisterData {
   nickname: string
 
   /* 用户账号 */
-  userId: string
+  username: string
 
   /* 用户密码 */
   password: string

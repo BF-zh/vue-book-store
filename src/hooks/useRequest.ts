@@ -9,7 +9,7 @@ type DefaultRequestOptions = Expand<CreateAxiosDefaults> & {
   afterRequest?: (result: AxiosResponse) => AxiosResponse
 }
 
-interface RequestParams<T = any> {
+interface RequestParams<T = any, R = any> {
   method?: Method
   url?: ShallowRef<string> | string
   params?: Record<string, any>
@@ -17,12 +17,13 @@ interface RequestParams<T = any> {
   watch?: boolean | (() => boolean)
   data?: ShallowRef<T | null> | T
   headers?: AxiosRequestHeaders
+  success?: (data: R) => void
   done?: () => void
   error?: (error: any) => void
 }
 
 // type RequestOptions = Expand<RequestParams>
-type RequestExecuteOptions<T> = Pick<RequestParams<T>, 'data' | 'params' | 'method' | 'url'>
+type RequestExecuteOptions<T, R = any> = Pick<RequestParams<T, R>, 'data' | 'params' | 'method' | 'url'> | T
 
 interface RequestResult<R = unknown, D = any> {
   data: ShallowRef<R | null>
@@ -31,7 +32,8 @@ interface RequestResult<R = unknown, D = any> {
   response: ShallowRef<Response | null>
   loading: ShallowRef<boolean>
   refresh: () => void
-  execute: (options?: RequestExecuteOptions<D>) => Promise<R>
+  execute: (options?: RequestExecuteOptions<D, R>) => Promise<R>
+  $execute: (data: D) => Promise<R>
   abort: () => void
 }
 
@@ -39,25 +41,27 @@ export function createRequest(options: DefaultRequestOptions) {
   const controller = new AbortController()
   const { beforeRequest, afterRequest, ...defaultOptions } = options
 
+  const fn = () => { }
+
   const https = axios.create({
     ...options,
     signal: controller.signal,
   })
 
-  https.interceptors.request.use(beforeRequest, (error) => {
-    return Promise.reject(error)
+  https.interceptors.request.use(beforeRequest, (config) => {
+    return { ...config, data: null, status: 502, message: '请求失败' }
   })
 
-  https.interceptors.response.use(afterRequest, (error) => {
-    return Promise.reject(error)
+  https.interceptors.response.use(afterRequest, (config) => {
+    return { ...config, data: null, status: 502, message: '请求失败' }
   })
 
-  return <R = any, D = any>(url: ShallowRef<string> | string, options?: RequestParams<D>): RequestResult<R, D> => {
+  return <R = any, D = any>(url: ShallowRef<string> | string, options?: RequestParams<D, R>): RequestResult<R, D> => {
     const allOptions = {
       ...defaultOptions,
       ...options,
     }
-    const { method, params, data, headers, immediate, watch: watchRef, done, error } = allOptions
+    const { method, params, data, headers, immediate, watch: watchRef, done = fn, error = fn, success = fn } = allOptions
     const _data = shallowRef<R | null>(null)
     const status = shallowRef<number>(0)
     const request = shallowRef<XMLHttpRequest | null>(null)
@@ -65,6 +69,7 @@ export function createRequest(options: DefaultRequestOptions) {
     const loading = shallowRef<boolean>(false)
 
     const execute = async (o?: RequestExecuteOptions<D>) => {
+      //
       const options = {
         ...allOptions,
         ...o,
@@ -82,19 +87,16 @@ export function createRequest(options: DefaultRequestOptions) {
         })
         _data.value = res
         status.value = res.status
+        success(res as R)
         return res as R
       }
-      catch (err) {
-        error?.(err)
-        return {
-          data: null,
-          status: 502,
-          message: '请求失败',
-        } as R
+      catch (err: unknown) {
+        error(err)
+        return err as R
       }
       finally {
         loading.value = false
-        done?.()
+        done()
       }
     }
 
@@ -124,6 +126,7 @@ export function createRequest(options: DefaultRequestOptions) {
       execute,
       refresh,
       abort,
+      $execute: (data: D) => execute({ data }),
     }
   }
 }
@@ -149,8 +152,6 @@ export const useRequest = createRequest({
     return config
   },
   afterRequest(result) {
-    const { code, message } = result.data
-    // ErrorCode.includes(code) && ElMessage.error(message)
     return result.data
   },
 })

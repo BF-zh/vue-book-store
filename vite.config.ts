@@ -31,7 +31,7 @@ export default defineConfig({
     AutoImport({
       dirs: ['src/store', 'src/hooks'],
       resolvers: [ElementPlusResolver({
-        importStyle: 'sass'
+        importStyle: 'sass',
       })],
       imports: ['vue', VueRouterAutoImports, 'pinia', '@vueuse/core', '@vueuse/head'],
       vueTemplate: true,

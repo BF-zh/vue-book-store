@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ILoginData } from '@/types'
+import { omit } from 'lodash'
 import { UserApi } from '@/api'
 import { defineFormItem } from '@/components/FormBuilder'
 
@@ -8,14 +9,16 @@ definePage({
   meta: {
     isPublic: true,
   },
-})
+}) 
+
+const router = useRouter()
 
 const formData = reactive<ILoginData>({
   password: '',
   username: '',
   type: 'users',
 })
-const { data, execute, loading } = UserApi.login(formData)
+const { $execute, loading } = UserApi.login(formData)
 const formItems = defineFormItem(() => [
   {
     key: 'username',
@@ -42,10 +45,6 @@ const formItems = defineFormItem(() => [
         max: 16,
         message: '账号长度为6-16位',
       },
-      // {
-      //   pattern: /^(?=.*[A-Z])(?=.*\d)[A-Z\d]{6,}$/i,
-      //   message: '必须包含至少一个字母和一个数字',
-      // },
     ],
   },
   {
@@ -70,20 +69,13 @@ const formItems = defineFormItem(() => [
 
 const formInstance = useTemplateRef('formRef')
 
-async function onSubmit() {
-  try {
-    await formInstance.value?.validate()
-    execute({ data: formData })
-  }
-  catch (e) {
-    // console.log('验证失败', e)
-  }
+function onSubmit() {
+  formInstance.value?.validate()?.then(()=>$execute(omit(formData, ['type'])))
 }
 </script>
 
 <template>
   <div class="flex h-full w-full items-center justify-center">
-    {{ data }}
     <el-card class="max-w-400px">
       <h2 class="mb-sm text-center">
         网上书店商城
@@ -99,7 +91,7 @@ async function onSubmit() {
         <el-button size="large" :loading="loading" @click="onSubmit">
           登录
         </el-button>
-        <el-link type="default">
+        <el-link type="default" @click="() => router.push('/register')">
           还没有账号？去注册
         </el-link>
       </div>

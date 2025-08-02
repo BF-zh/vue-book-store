@@ -34,6 +34,7 @@ declare module 'vue' {
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElUpload: typeof import('element-plus/es')['ElUpload']
     FormBuilder: typeof import('./../src/components/FormBuilder/FormBuilder.vue')['default']
     HelloWorld: typeof import('./../src/components/HelloWorld.vue')['default']
     Modal: typeof import('./../src/components/Modal.vue')['default']
