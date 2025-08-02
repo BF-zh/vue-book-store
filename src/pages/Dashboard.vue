@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { AdminLoginParams } from '@/types'
-import { Setting } from '@element-plus/icons-vue'
+import type { AdminLoginData } from '@/types'
+import { Setting, Menu } from '@element-plus/icons-vue'
 
 definePage({
   name: 'dashboard',
@@ -10,9 +10,9 @@ definePage({
 })
 const adminStore = useAdminStore()
 
-const adminInfo = ref<AdminLoginParams>()
+const adminInfo = ref<AdminLoginData>()
 onMounted(async () => {
-  adminInfo.value = await adminStore.adminInfo() as AdminLoginParams
+  adminInfo.value = await adminStore.adminInfo() as AdminLoginData
 })
 const router = useRouter()
 const activeMenu = ref<string>('books')
@@ -71,8 +71,8 @@ function logout() {
         <el-menu-item route="/dashboard/users" index="users">
           👥 用户管理
         </el-menu-item>
-        <el-menu-item route="/dashboard/users" index="users">
-          👥 用户管理
+        <el-menu-item route="/dashboard/classify" index="users">
+         <el-icon><Menu /></el-icon> 分类管理
         </el-menu-item>
         <el-menu-item route="/dashboard/orders" index="orders">
           🛒 订单管理

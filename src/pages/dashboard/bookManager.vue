@@ -72,7 +72,8 @@ onMounted(() => {
       @input="filterBooks"
     />
     <el-button type="primary" style="margin-left: 10px; margin-bottom: 16px" @click="openAddDialog">
-      ➕ 添加图书
+      <!-- ➕ 添加图书 -->
+      搜索
     </el-button>
 
     <!-- 图书表格 -->
@@ -140,7 +141,7 @@ onMounted(() => {
         </el-button>
       </template>
     </el-dialog> -->
-    <AddBook />
+    <!-- <AddBook /> -->
     <!-- 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" title="编辑图书">
       <el-form :model="editedBook" label-width="60px">

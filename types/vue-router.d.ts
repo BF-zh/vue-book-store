@@ -19,12 +19,13 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/[...all]': RouteRecordInfo<'/[...all]', '/:all(.*)', { all: ParamValue<true> }, { all: ParamValue<false> }>,
+    'dashboard': RouteRecordInfo<'dashboard', '/dashboard', Record<never, never>, Record<never, never>, '/dashboard/addBook' | '/dashboard/bookManager' | '/dashboard/classify'>,
     '/dashboard/addBook': RouteRecordInfo<'/dashboard/addBook', '/dashboard/addBook', Record<never, never>, Record<never, never>>,
     '/dashboard/bookManager': RouteRecordInfo<'/dashboard/bookManager', '/dashboard/bookManager', Record<never, never>, Record<never, never>>,
-    'dashboard': RouteRecordInfo<'dashboard', '/Dashboard', Record<never, never>, Record<never, never>>,
+    '/dashboard/classify': RouteRecordInfo<'/dashboard/classify', '/dashboard/classify', Record<never, never>, Record<never, never>>,
     'home': RouteRecordInfo<'home', '/home', Record<never, never>, Record<never, never>>,
     'login': RouteRecordInfo<'login', '/Login', Record<never, never>, Record<never, never>>,
-    'register': RouteRecordInfo<'register', '/Register', Record<never, never>, Record<never, never>>,
+    'register': RouteRecordInfo<'register', '/register', Record<never, never>, Record<never, never>>,
     '/test': RouteRecordInfo<'/test', '/test', Record<never, never>, Record<never, never>>,
     '/testForm': RouteRecordInfo<'/testForm', '/testForm', Record<never, never>, Record<never, never>>,
     '/testupload': RouteRecordInfo<'/testupload', '/testupload', Record<never, never>, Record<never, never>>,
