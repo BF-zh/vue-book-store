@@ -7,9 +7,9 @@ export interface ILoginData {
   type: 'users' | 'admin'
 }
 
-// export interface IToken {
-//   token: string
-// }
+export interface IToken {
+  token: string
+}
 
 // 用户信息
 export interface UserInfo {
