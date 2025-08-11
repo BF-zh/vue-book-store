@@ -2,6 +2,12 @@
 import AddBook from '@/components/AddBook.vue'
 import { useBookStore } from '@/store/bookStore'
 
+definePage({
+  meta: {
+    isPublic: true,
+  },
+})
+
 const useBook = useBookStore()
 
 const books = useBook.books

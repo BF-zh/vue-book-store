@@ -43,14 +43,13 @@ async function saveEdit() {
 
 async function saveAdd() {
   const res = await bookTypeAdd(editedType.newType)
-    if (res.code !== 200 || !res) {
+  if (res.code !== 200 || !res) {
     ElMessage.error(res.message)
     return
   }
   ElMessage.success('添加成功')
   addDialogVisible.value = false
   setTimeout(() => location.reload(), 1000)
-  
 }
 
 async function deleteBookType(type: string) {
@@ -64,7 +63,7 @@ async function deleteBookType(type: string) {
     setTimeout(() => location.reload(), 1000)
   }
 }
-async function bookTypeLoad(){
+async function bookTypeLoad() {
   const type = await getAllBookType('')
   filteredType.value = []
   let i = 1
@@ -72,14 +71,13 @@ async function bookTypeLoad(){
     filteredType.value?.push({ id: i++, bookType: k.bookType })
   })
 }
-async function handleError(){
+async function handleError() {
   searchKeyword.value = ''
   await bookTypeLoad()
 }
 
 onMounted(async () => {
   await bookTypeLoad()
-
 })
 </script>
 
@@ -131,7 +129,7 @@ onMounted(async () => {
       </el-button>
     </template>
   </el-dialog>
-    <el-dialog v-model="addDialogVisible" title="添加图书类型">
+  <el-dialog v-model="addDialogVisible" title="添加图书类型">
     <el-form :model="editedType" label-width="60px">
       <el-form-item label="新类型">
         <el-input v-model="editedType.newType" />

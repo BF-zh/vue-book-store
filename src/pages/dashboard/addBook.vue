@@ -1,214 +1,145 @@
 <script setup lang="ts">
-import type { UploadProps, UploadUserFile } from 'element-plus'
-import type { IBooks } from '@/types'
-import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue'
-import http from '@/utils/request'
+import type { UploadUserFile } from 'element-plus'
+import type { TBookData } from '@/types'
+import { defineFormItem } from '@/components/FormBuilder'
 
-const form = reactive<IBooks>({
-  bookId: '',
-  bookName: '',
-  bookMoney: 0,
-  bookNum: 0,
-  bookWriter: '',
-  bookPress: '',
-  createTime: new Date().toLocaleString(),
-  bookStatus: 1,
+definePage({
+  name: 'add-book',
+  meta: {
+    // isPublic: true,
+  },
 })
 
-// const imageUrl = ref('')
+const formData = reactive<TBookData>({
+  bookName: '',
+  bookMoney: 0,
+  bookWriter: '',
+  bookPress: '',
+  bookStatus: 1,
+  bookNum: 0,
+  files: [],
+})
 
-// const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
-//   imageUrl.value = URL.createObjectURL(uploadFile.raw!)
-// }
+const formInstance = useTemplateRef('formRef')
 
-// const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-// //   if (rawFile.type !== 'image/jpeg') {
-// //     ElMessage.error('Avatar picture must be JPG format!')
-//   console.log(rawFile)
-//   //     return false
-//   //   }
-//   //   else if (rawFile.size / 1024 / 1024 > 2) {
-//   //     ElMessage.error('Avatar picture size can not exceed 2MB!')
-//   //     return false
-//   //   }
-//   // imageUrl.value = URL.createObjectURL(rawFile)
-
-//   return true
-// }
-// const dialogImageUrl = ref('')
-// const dialogVisible = ref(false)
-
-// const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
-//   dialogImageUrl.value = uploadFile.url!
-//   dialogVisible.value = true
-// }
-const imagePreview = ref() // 图片预览
-const fileInput = ref() // 文件输入
-const modalVisible = ref(false) // 模态框显示状态
-
-// 触发文件选择
-function triggerFileInput() {
-  fileInput.value.click()
-  console.log(fileInput)
-}
-
-// 处理文件选择
-function handleFileChange(event: any) {
-  const file = event.target.files[0]
-  if (file && file.type.startsWith('image/')) {
-    // 创建图片预览
-    // const reader = new FileReader()
-    // reader.onload = () => {
-    //   imagePreview.value = reader.result
-    // }
-    // reader.readAsDataURL(file)
-    imagePreview.value = URL.createObjectURL(file)
+const formItem = defineFormItem(() => [
+  {
+    key: 'bookName',
+    label: '书名',
+    rules: [
+      {
+        required: true,
+        message: '书名不能为空',
+      },
+    ],
+  },
+  {
+    key: 'bookWriter',
+    label: '作者',
+    rules: [{
+      required: true,
+      message: '作者不能为空',
+    }],
+  },
+  {
+    key: 'bookPress',
+    label: '出版社',
+    rules: [{
+      required: true,
+      message: '出版社不能为空',
+    }],
+  },
+  {
+    key: 'bookNum',
+    type: 'number',
+    label: '数量',
+    rules: [{
+      required: true,
+      message: '数量不能为空',
+    }],
+  },
+  {
+    key: 'bookMoney',
+    type: 'number',
+    label: '价格',
+    rules: [{
+      required: true,
+      message: '价格不能为空',
+    }],
+  },
+  {
+    key: 'bookStatus',
+    label: '是否上架',
+    type: 'switch',
+    activeValue: 1,
+    inactiveValue: 0,
+  },
+  {
+    key: 'files',
+    label: '展示图片',
+    rules: [
+      {
+        validator(_, value: UploadUserFile[], callback) {
+          if (value && value.length >= 1)
+            return callback()
+          callback('请选择图片')
+        },
+        required: true,
+        message: '请选择展示图片',
+      },
+    ],
+  },
+])
+async function submitUpload() {
+  try {
+    await formInstance.value?.validate()
+    const { files } = formData
+    const fd = new FormData()
+    files.forEach(({ raw }) => {
+      raw && fd.append('files', raw)
+    })
+    fd.append('bookName', formData.bookName)
+    fd.append('bookMoney', String(formData.bookMoney))
+    fd.append('bookWriter', formData.bookWriter)
+    fd.append('bookPress', formData.bookPress)
+    fd.append('bookStatus', String(formData.bookStatus))
+    fd.append('bookNum', String(formData.bookNum))
   }
-  else {
-    alert('请上传有效的图片文件')
+  catch {
+    console.log('error')
   }
-}
-const headers = { 'Content-Type': 'multipart/form-data' }
-// 上传图片 (这里只是一个模拟方法，你可以替换为实际的上传逻辑)
-function uploadImage() {
-  const formData = new FormData()
-  formData.append('files', fileInput.value.files[0])
-  const res = http.post('/download', formData, { headers })
-  console.log(res)
-
-  // alert('图片已上传！')
-  // // 清空选择的图片
-  // imagePreview.value = null
-}
-
-// 打开模态框显示大图
-function openModal() {
-  modalVisible.value = true
-}
-
-// 关闭模态框
-function closeModal() {
-  modalVisible.value = false
 }
 </script>
 
 <template>
-  <el-form :model="form" style="max-width: 600px; display: flex; flex-direction: column; justify-content: center;" @submit.prevent>
-    <el-form-item label="书&emsp;&emsp;名">
-      <el-input v-model="form.bookName" />
-    </el-form-item>
-    <el-form-item label="作&emsp;&emsp;者">
-      <el-input v-model="form.bookWriter" />
-    </el-form-item>
-    <el-form-item label="出&nbsp;&nbsp;版&nbsp;&nbsp;社">
-      <el-input v-model="form.bookPress" />
-    </el-form-item>
-    <el-form-item label="数&emsp;&emsp;量">
-      <el-input-number v-model="form.bookNum" />
-    </el-form-item>
-    <el-form-item label="价&emsp;&emsp;格">
-      <el-input-number v-model="form.bookMoney">
-        <template #suffix>
-          <span>RMB</span>
+  <FormBuilder ref="formRef" v-model="formData" label-width="100" scroll-to-error :items="formItem" label-suffix="：" class="w-lg">
+    <template #files>
+      <el-upload
+        v-model:file-list="formData.files"
+        :auto-upload="false"
+        drag
+        accept="image/*"
+        multiple
+        class="w-full"
+      >
+        <div>
+          <i class="i-ep:upload-filled c-gray size-2em" />
+          <div>
+            Drop file here or <em>click to upload</em>
+          </div>
+        </div>
+
+        <template #tip>
+          <div class="text-center">
+            jpg/png 格式的文件 且大小不超过 5M
+          </div>
         </template>
-      </el-input-number>
-    </el-form-item>
-    <el-form-item label="展示图片">
-      <div class="image-upload">
-        <input
-          ref="fileInput"
-          type="file"
-          accept="image/*"
-          hidden
-          @change="handleFileChange"
-        >
-        <ElButton ty @click="triggerFileInput">
-          选择图片
-        </ElButton>
-
-        <div v-if="imagePreview" class="image-preview h-200px w-150px relative">
-          <!-- 点击预览图显示大图 -->
-          <img
-            :src="imagePreview"
-            class="h-full w-full"
-            alt="image preview"
-            @click="openModal"
-          >
-          <span class="right-0 top-0 absolute">
-            <el-icon>
-              <Delete />
-            </el-icon>
-          </span>
-        </div>
-
-        <!-- 模态框显示大图 -->
-        <div v-if="modalVisible" class="modal" @click="closeModal">
-          <img :src="imagePreview" alt="image preview" class="modal-image">
-        </div>
-
-        <button v-if="imagePreview" @click="uploadImage">
-          上传图片
-        </button>
-      </div>
-    </el-form-item>
-    <el-form-item label="是否上架">
-      <el-radio-group v-model="form.bookStatus">
-        <el-radio value="1">
-          上架
-        </el-radio>
-        <el-radio value="0">
-          不上架
-        </el-radio>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary">
-        添加
-      </el-button>
-      <el-button>
-        清空
-      </el-button>
-    </el-form-item>
-  </el-form>
+      </el-upload>
+    </template>
+  </FormBuilder>
+  <div>
+    <el-button @click="() => submitUpload()">
+      提交
+    </el-button>
+  </div>
 </template>
-
-<style scoped>
-.image-upload {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.image-preview img {
-  max-width: 100%;
-  max-height: 300px;
-  object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.image-preview img:hover {
-  transform: scale(1.1);
-}
-
-/* 模态框样式 */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal-image {
-  max-width: 90%;
-  max-height: 90%;
-  object-fit: contain;
-}
-</style>

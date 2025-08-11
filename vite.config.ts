@@ -30,7 +30,9 @@ export default defineConfig({
     UnoCSS(),
     AutoImport({
       dirs: ['src/store', 'src/hooks'],
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver({
+        importStyle: 'sass',
+      })],
       imports: ['vue', VueRouterAutoImports, 'pinia', '@vueuse/core', '@vueuse/head'],
       vueTemplate: true,
       dts: 'types/auto-imports.d.ts',
@@ -39,12 +41,20 @@ export default defineConfig({
       dirs: ['src/components'],
       dts: 'types/components.d.ts',
       resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
-      include: [/\.vue$/, /\.vue\?vue/, /\.vue\?vue-component/],
+      deep: true,
+      include: [/\.vue$/, /\.vue\?vue/, /\.vue\?vue-component/, /src\/.*\.ts$/],
     }),
   ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+    },
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: ['legacy-js-api'],
+      },
     },
   },
   server: {

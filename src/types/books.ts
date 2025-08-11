@@ -1,3 +1,5 @@
+import type { UploadFile } from 'element-plus'
+
 export interface IBooks {
   /* 书的编号 */
   bookId: string
@@ -6,13 +8,13 @@ export interface IBooks {
   bookName: string
 
   /* 书的价格 */
-  bookMoney: number
+  bookMoney: number // bookPrice
 
   /* 剩余数量 */
-  bookNum: number
+  bookNum: number //
 
   /* 书的作者 */
-  bookWriter: string
+  bookWriter: string // bookAuthor
 
   /* 出版社 */
   bookPress: string
@@ -25,4 +27,8 @@ export interface IBooks {
 
   /* 上架情况 */
   bookStatus: 1 | 0
+}
+
+export type TBookData = Pick<IBooks, 'bookName' | 'bookMoney' | 'bookWriter' | 'bookPress' | 'bookStatus' | 'bookNum'> & {
+  files: UploadFile[]
 }

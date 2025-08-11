@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import type { AdminLoginData } from '@/types'
-import { Setting, Menu } from '@element-plus/icons-vue'
+import { Menu, Setting } from '@element-plus/icons-vue'
 
 definePage({
   name: 'dashboard',
   meta: {
-    isPublic: false,
+    isPublic: true,
+    layout: 'admin',
+    isAdmin: true,
   },
 })
+
 const adminStore = useAdminStore()
 
 const adminInfo = ref<AdminLoginData>()
@@ -72,7 +75,7 @@ function logout() {
           👥 用户管理
         </el-menu-item>
         <el-menu-item route="/dashboard/classify" index="users">
-         <el-icon><Menu /></el-icon> 分类管理
+          <el-icon><Menu /></el-icon> 分类管理
         </el-menu-item>
         <el-menu-item route="/dashboard/orders" index="orders">
           🛒 订单管理

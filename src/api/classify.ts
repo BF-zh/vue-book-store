@@ -6,17 +6,17 @@ import http from '@/utils/request'
 // }
 
 export async function bookTypeAdd(bookType: string): Promise<IRes<string>> {
-  return await http.post(`/classification/${bookType}`)
+  return await http.post(`/classification/add`, bookType)
 }
 
 export async function bookTypeUpdate(type: IBookTypeParams): Promise<IRes<string>> {
   return await http.post(`/classification/update`, type)
 }
 
-export async function getAllBookType(searchKeyword: string): Promise<IRes<IResTypeData[]>> {
-  return await http.get(`/classification/getAll?searchKeyword=${searchKeyword}`)
+export async function getAllBookType(keyword: string): Promise<IRes<IResTypeData[]>> {
+  return await http.get(`/classification/getAll?keyword=${keyword}`)
 }
 
 export async function delBookType(type: string): Promise<IRes<string>> {
-  return await http.get(`/classification/${type}`)
+  return await http.delete(`/classification/${type}`)
 }
