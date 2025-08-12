@@ -67,9 +67,9 @@ const formItems = defineFormItem(() => [
         message: '密码不能为空',
       },
       {
-        validator: (_,val,handleError) => {
+        validator: (_, val, handleError) => {
           if (formData.password !== val) {
-           return handleError("两次密码不一致")
+            return handleError('两次密码不一致')
           }
           return true
         },
@@ -81,7 +81,7 @@ const formItems = defineFormItem(() => [
 const formInstance = useTemplateRef('formRef')
 
 function onSubmit() {
-  formInstance.value?.validate()?.then(()=>$execute(formData))
+  formInstance.value?.validate()?.then(() => $execute(formData))
 }
 </script>
 
@@ -91,7 +91,7 @@ function onSubmit() {
       <h2 class="mb-sm text-center">
         注册账号
       </h2>
-      <form-builder ref="formRef" v-model="formData" :items="formItems" label-width="100" label-suffix="：" scroll-to-error :onsubmit="()=>console.log('submit')"  />
+      <form-builder ref="formRef" v-model="formData" :items="formItems" label-width="100" label-suffix="：" scroll-to-error :onsubmit="() => console.log('submit')" />
       <div class="gap-sm flex flex-col">
         <el-button size="large" :loading="loading" @click="onSubmit">
           注册账号

@@ -1,5 +1,5 @@
 <script setup>
-import { Delete, Plus } from '@element-plus/icons-vue'
+import { Delete } from '@element-plus/icons-vue'
 
 const imagePreview = ref(null) // 单张图片预览
 const fileInput = ref(null) // 文件输入

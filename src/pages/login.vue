@@ -9,7 +9,7 @@ definePage({
   meta: {
     isPublic: true,
   },
-}) 
+})
 
 const router = useRouter()
 
@@ -70,7 +70,7 @@ const formItems = defineFormItem(() => [
 const formInstance = useTemplateRef('formRef')
 
 function onSubmit() {
-  formInstance.value?.validate()?.then(()=>$execute(omit(formData, ['type'])))
+  formInstance.value?.validate()?.then(() => $execute(omit(formData, ['type'])))
 }
 </script>
 

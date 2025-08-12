@@ -14,7 +14,7 @@ export function login(_data: ILoginData) {
       setToken(data.token, isAdmin.value ? 'admin' : 'user')
       setTimeout(() => {
         router.push(isAdmin.value ? '/dashboard' : '')
-      }, 500);
+      }, 500)
     },
   })
 }
@@ -32,7 +32,7 @@ export function register() {
       setToken(data.token, 'user')
       setTimeout(() => {
         router.push('/user')
-      }, 500);
-    }
+      }, 500)
+    },
   })
 }

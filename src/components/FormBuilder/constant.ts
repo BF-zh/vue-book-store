@@ -10,7 +10,6 @@ import 'element-plus/theme-chalk/el-checkbox.css'
 import 'element-plus/theme-chalk/el-checkbox-group.css'
 import 'element-plus/theme-chalk/el-option.css'
 
-
 export const ITEM_MAP = {
   input: ElInput,
   select: ElSelect,

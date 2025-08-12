@@ -21,15 +21,15 @@ interface BaseItem {
 //  生成工具类型
 type GenerateProps<K extends keyof typeof ITEM_MAP, P, O extends boolean = false> = (O extends true
   ? {
-    readonly type?: `${K}`
-    props?: Expand<Partial<P & Events>>
-    options: IOptions[]
+      readonly type?: `${K}`
+      props?: Expand<Partial<P & Events>>
+      options: IOptions[]
 
-  }
+    }
   : {
-    readonly type?: `${K}`
-    props?: Expand<Partial<P & Events>>
-  }) & Expand<Partial<P & Events>>
+      readonly type?: `${K}`
+      props?: Expand<Partial<P & Events>>
+    }) & Expand<Partial<P & Events>>
 
 type InputItem = GenerateProps<'input', InputProps>
 

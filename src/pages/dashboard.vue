@@ -7,7 +7,7 @@ definePage({
   meta: {
     isPublic: true,
     layout: 'admin',
-    isAdmin:true
+    isAdmin: true,
   },
 })
 
