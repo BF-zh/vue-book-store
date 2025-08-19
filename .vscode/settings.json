@@ -170,6 +170,7 @@
     "unplugin",
     "vueuse",
     "VITE",
-    "Attributify"
+    "Attributify",
+    "Arrayable"
   ]
 }

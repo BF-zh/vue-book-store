@@ -13,7 +13,7 @@ const router = createRouter({
 router.beforeEach((to, _, next) => {
   const { isAuthenticated, isAdmin } = useAuthStore()
   if (to.name === 'login' && isAuthenticated) {
-    return next({ name: 'home' })
+    return next({ name: isAdmin ? 'dashboard' : 'home' })
   }
   if (!to.meta.isPublic && !isAuthenticated) {
     return next({ name: 'login' })

@@ -27,8 +27,16 @@ export interface IBooks {
 
   /* 上架情况 */
   bookStatus: 1 | 0
-}
 
-export type TBookData = Pick<IBooks, 'bookName' | 'bookMoney' | 'bookWriter' | 'bookPress' | 'bookStatus' | 'bookNum'> & {
+  /** 分类 */
+  types: string[]
+
+  /* 封面图片 */
   files: UploadFile[]
 }
+
+export interface IBookType {
+  type: string
+}
+
+export type TBookData = Omit<IBooks, 'bookId' | 'createTime' | 'updateTime'>
