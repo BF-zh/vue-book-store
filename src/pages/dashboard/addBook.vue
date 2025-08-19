@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import type { UploadUserFile } from 'element-plus'
+import type { UploadInstance, UploadProps, UploadRawFile, UploadUserFile } from 'element-plus'
 import type { TBookData } from '@/types'
+import { genFileId } from 'element-plus'
 import { defineFormItem } from '@/components/FormBuilder'
 
 definePage({
   name: 'add-book',
   meta: {
     // isPublic: true,
+    name: '添加图书',
   },
 })
 
@@ -18,6 +20,7 @@ const formData = reactive<TBookData>({
   bookStatus: 1,
   bookNum: 0,
   files: [],
+  types: [],
 })
 
 const formInstance = useTemplateRef('formRef')
@@ -50,6 +53,29 @@ const formItem = defineFormItem(() => [
     }],
   },
   {
+    type: 'select',
+    key: 'types',
+    label: '分类',
+    rules: [{
+      required: true,
+      message: '请选择分类',
+    }],
+    options: [
+      { label: '文学', value: 'literature' },
+      { label: '科技', value: 'technology' },
+      { label: '历史', value: 'history' },
+      { label: '艺术', value: 'art' },
+      { label: '哲学', value: 'philosophy' },
+      { label: '经济', value: 'economics' },
+      { label: '政治', value: 'politics' },
+      { label: '教育', value: 'education' },
+      { label: '心理学', value: 'psychology' },
+      { label: '社会学', value: 'sociology' },
+      { label: '宗教', value: 'religion' },
+      { label: '其他', value: 'other' },
+    ],
+  },
+  {
     key: 'bookNum',
     type: 'number',
     label: '数量',
@@ -58,6 +84,7 @@ const formItem = defineFormItem(() => [
       message: '数量不能为空',
     }],
   },
+
   {
     key: 'bookMoney',
     type: 'number',
@@ -104,10 +131,22 @@ async function submitUpload() {
     fd.append('bookPress', formData.bookPress)
     fd.append('bookStatus', String(formData.bookStatus))
     fd.append('bookNum', String(formData.bookNum))
+    console.log('提交数据', fd) // 这里可以调用 API 上传数据
+    // await uploadBook(fd) // 假设有一个 uploadBook 函数来处理上传
+    formData.files = [] // 清空已上传的文件
+    formInstance.value?.resetFields() // 重置表单
+    console.log('上传成功')
   }
   catch {
     console.log('error')
   }
+}
+const upload = useTemplateRef<UploadInstance>('upload')
+const handleExceed: UploadProps['onExceed'] = (files) => {
+  upload.value!.clearFiles()
+  const file = files[0] as UploadRawFile
+  file.uid = genFileId()
+  upload.value!.handleStart(file)
 }
 </script>
 
@@ -115,11 +154,13 @@ async function submitUpload() {
   <FormBuilder ref="formRef" v-model="formData" label-width="100" scroll-to-error :items="formItem" label-suffix="：" class="w-lg">
     <template #files>
       <el-upload
+        ref="upload"
         v-model:file-list="formData.files"
+        :on-exceed="handleExceed"
         :auto-upload="false"
         drag
         accept="image/*"
-        multiple
+        :limit="1"
         class="w-full"
       >
         <div>

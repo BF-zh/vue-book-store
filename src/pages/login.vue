@@ -35,6 +35,7 @@ const formItems = defineFormItem(() => [
     key: 'password',
     label: '密码',
     placeholder: '请输入密码',
+    showPassword: true,
     rules: [
       {
         required: true,

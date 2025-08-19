@@ -19,12 +19,15 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/[...all]': RouteRecordInfo<'/[...all]', '/:all(.*)', { all: ParamValue<true> }, { all: ParamValue<false> }>,
-    'dashboard': RouteRecordInfo<'dashboard', '/dashboard', Record<never, never>, Record<never, never>, '/dashboard/[...all]' | '/dashboard/bookManager' | '/dashboard/classify' | 'add-book'>,
+    '/dashboard': RouteRecordInfo<'/dashboard', '/dashboard', Record<never, never>, Record<never, never>, '/dashboard/[...all]' | '/dashboard/bookManager' | 'add-book' | 'book-type' | 'classify'>,
     '/dashboard/[...all]': RouteRecordInfo<'/dashboard/[...all]', '/dashboard/:all(.*)', { all: ParamValue<true> }, { all: ParamValue<false> }>,
     'add-book': RouteRecordInfo<'add-book', '/dashboard/addBook', Record<never, never>, Record<never, never>>,
+    'book-type': RouteRecordInfo<'book-type', '/dashboard/book-type', Record<never, never>, Record<never, never>>,
     '/dashboard/bookManager': RouteRecordInfo<'/dashboard/bookManager', '/dashboard/bookManager', Record<never, never>, Record<never, never>>,
-    '/dashboard/classify': RouteRecordInfo<'/dashboard/classify', '/dashboard/classify', Record<never, never>, Record<never, never>>,
-    'home': RouteRecordInfo<'home', '/home', Record<never, never>, Record<never, never>>,
+    'classify': RouteRecordInfo<'classify', '/dashboard/classify', Record<never, never>, Record<never, never>>,
+    'home': RouteRecordInfo<'home', '/home', Record<never, never>, Record<never, never>, '/home/indexPage' | 'personal-center'>,
+    '/home/indexPage': RouteRecordInfo<'/home/indexPage', '/home/indexPage', Record<never, never>, Record<never, never>>,
+    'personal-center': RouteRecordInfo<'personal-center', '/home/personal-center', Record<never, never>, Record<never, never>>,
     'login': RouteRecordInfo<'login', '/login', Record<never, never>, Record<never, never>>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
     '/user': RouteRecordInfo<'/user', '/user', Record<never, never>, Record<never, never>>,

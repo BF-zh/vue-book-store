@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { bookTypeAdd, bookTypeUpdate, delBookType, getAllBookType } from '@/api/classify'
 
+definePage({
+  name: 'classify',
+  meta: {
+    name: '分类管理',
+  },
+})
+
 const searchKeyword = ref('')
 const editDialogVisible = ref(false)
 const addDialogVisible = ref(false)

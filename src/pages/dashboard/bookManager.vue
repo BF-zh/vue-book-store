@@ -2,10 +2,12 @@
 import type { IBooks } from '@/types'
 import { deleteBook, getAllBooks } from '@/api/book'
 import { useBookStore } from '@/store/bookStore'
+import { getAllBookType } from '@/api/classify'
 
 definePage({
   meta: {
     isPublic: true,
+    name: '图书列表',
   },
 })
 
@@ -13,7 +15,6 @@ const useBook = useBookStore()
 
 const books = useBook.books
 const loading = ref(true)
-const keyword = ref('')
 // const currentPage = ref(1)
 // const pageSize = ref(10)
 const url = 'http://localhost:8080/api/images/book/'
@@ -109,9 +110,23 @@ async function loadBook() {
   useBook.pageParamsRes = res.data
 }
 
+const type = ref('全部')
+const options = ref([
+  // { label: '全部' },
+])
+
+async function changeHandler(){
+  console.log(type.value);
+  // pageParams.bookType = type.value
+  // await getAllBooks(pageParams)
+}
+
 onMounted(async () => {
   await loadBook()
   loading.value = false
+
+  const res = await getAllBookType('')
+  res.data.forEach(k => options.value.push({label: k.bookType}))
 })
 </script>
 
@@ -122,9 +137,24 @@ onMounted(async () => {
       v-model="pageParams.keyWords"
       placeholder="请输入ID或书名或作者搜索"
       clearable
-      style="width: 300px; margin-bottom: 16px"
+      style="width: 300px; "
       @input="loadBook()"
     />
+    <!-- 分类：
+    <el-select
+      v-model="type"
+      value-key="id"
+      placeholder="选择"
+      style="width: 240px;"
+      :change="changeHandler()"
+    >
+      <el-option
+        v-for="item in options"
+        :key="item.id"
+        :label="item.label"
+        :value="item"
+      />
+    </el-select> -->
     <!-- <el-button type="primary" style="margin-left: 10px; margin-bottom: 16px" @click="openAddDialog">
       ➕ 添加图书
       搜索

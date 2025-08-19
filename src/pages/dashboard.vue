@@ -2,14 +2,13 @@
 import type { AdminLoginData } from '@/types'
 import { Menu, Setting } from '@element-plus/icons-vue'
 
-definePage({
-  name: 'dashboard',
-  meta: {
-    isPublic: true,
-    layout: 'admin',
-    isAdmin: true,
-  },
-})
+// definePage({
+//   name: 'dashboard',
+//   meta: {
+//     layout: 'admin',
+//     isAdmin: true,
+//   },
+// })
 
 const adminStore = useAdminStore()
 
@@ -18,6 +17,7 @@ onMounted(async () => {
   adminInfo.value = await adminStore.adminInfo() as AdminLoginData
 })
 const router = useRouter()
+const route = useRoute()
 const activeMenu = ref<string>('books')
 
 const menuTitleMap = {
@@ -90,7 +90,8 @@ function logout() {
     <el-container>
       <el-header style="background: #F0F8FF; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
         <div>
-          当前模块：{{ menuTitleMap[activeMenu] }}
+          <!-- 当前模块：{{ menuTitleMap[activeMenu] }} -->
+          当前模块：{{ route.meta.name }}
         </div>
         <!-- <el-button type="danger" size="small" @click="logout">
           退出登录
@@ -124,16 +125,5 @@ function logout() {
 </template>
 
 <style scoped>
-.logo {
-  font-size: 18px;
-  font-weight: bold;
-  padding: 20px;
-  text-align: center;
-}
-.example-showcase .el-dropdown-link {
-  cursor: pointer;
-  color: var(--el-color-primary);
-  display: flex;
-  align-items: center;
-}
+
 </style>
