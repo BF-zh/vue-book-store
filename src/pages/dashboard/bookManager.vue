@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import AddBook from '@/components/AddBook.vue'
+import type { IBooks } from '@/types'
+import { deleteBook, getAllBooks } from '@/api/book'
 import { useBookStore } from '@/store/bookStore'
 
 definePage({
@@ -11,42 +12,78 @@ definePage({
 const useBook = useBookStore()
 
 const books = useBook.books
-
-const searchKeyword = ref('')
-const currentPage = ref(1)
-const pageSize = ref(10)
-const url = ref('http://localhost:8080/api/d1f51447-fd2f-4a09-b676-78f63e556fa0-屏幕截图 2025-07-10 233515.png')
-
-const filteredBooks = computed(() => {
-  const keyword = searchKeyword.value.trim().toLowerCase()
-  if (!keyword)
-    return books
-  return books.filter(
-    book =>
-      book.title.toLowerCase().includes(keyword)
-      || book.author.toLowerCase().includes(keyword),
-  )
+const loading = ref(true)
+const keyword = ref('')
+// const currentPage = ref(1)
+// const pageSize = ref(10)
+const url = 'http://localhost:8080/api/images/book/'
+const pageParams = reactive({
+  pageNum: 1,
+  pageSize: 10,
+  keyWords: '',
+  bookType: '',
 })
-// 添加逻辑
-// const newBook = ref({ title: '', author: '', price: 0 })
-const newBook = ref(useBook.$state.newBook)
+// const filteredBooks = computed(() => {
+//   const keyword1 = keyword.value.trim().toLowerCase()
+//   if (!keyword1)
+//     return books
+//   return books.filter(
+//     book =>
+//       book.title.toLowerCase().includes(keyword)
+//       || book.author.toLowerCase().includes(keyword),
+//   )
+// })
 
-function openAddDialog() {
-  newBook.value = { title: '', author: '', price: 0 }
-  useBook.addDialogVisible = true
+function delBook(row: IBooks) {
+  const str = row.bookStatus === '下架' ? '上架' : '下架'
+  ElMessageBox.confirm(
+    `是否?${str}?`,
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+      center: true,
+    },
+  )
+    .then(async () => {
+      await deleteBook(row.bookId)
+      await loadBook()
+      ElMessage.success(`${str}成功`)
+      // location.reload()
+    })
+    .catch(() => {
+      ElMessage.info(`取消${str}`)
+    })
 }
+// function open() {
 
-// function addBook() {
-//   const nextId = books.length ? Math.max(...books.map(b => b.id)) + 1 : 1
-//   books.push({ id: nextId, ...newBook.value })
-//   addDialogVisible.value = false
+//   ElMessageBox.confirm(
+//     `是否?${}`,
+//     '警告',
+//     {
+//       confirmButtonText: 'OK',
+//       cancelButtonText: 'Cancel',
+//       type: 'warning',
+//       center: true,
+//     },
+//   )
+//     .then(() => {
+//       ElMessage({
+//         type: 'success',
+//         message: 'Delete completed',
+//       })
+//     })
+//     .catch(() => {
+//       ElMessage({
+//         type: 'info',
+//         message: 'Delete canceled',
+//       })
+//     })
 // }
-// 删除逻辑
-function deleteBook(index) {
-  books.splice(index, 1)
-}
 
 // 编辑逻辑
+
 const editDialogVisible = ref(false)
 const editedBook = ref({})
 
@@ -62,8 +99,19 @@ function saveEdit() {
   }
   editDialogVisible.value = false
 }
-onMounted(() => {
-  console.log(books)
+
+async function loadBook() {
+  const res = await getAllBooks(pageParams)
+  res.data.records.forEach((k) => {
+    k.bookImage = url + k.bookImage
+    k.bookStatus = k.bookStatus ? '上架' : '下架'
+  })
+  useBook.pageParamsRes = res.data
+}
+
+onMounted(async () => {
+  await loadBook()
+  loading.value = false
 })
 </script>
 
@@ -71,30 +119,31 @@ onMounted(() => {
   <div>
     <!-- 搜索和添加 -->
     <el-input
-      v-model="searchKeyword"
+      v-model="pageParams.keyWords"
       placeholder="请输入书名或作者"
       clearable
       style="width: 300px; margin-bottom: 16px"
-      @input="filterBooks"
+      @input="loadBook()"
     />
-    <el-button type="primary" style="margin-left: 10px; margin-bottom: 16px" @click="openAddDialog">
-      <!-- ➕ 添加图书 -->
+    <!-- <el-button type="primary" style="margin-left: 10px; margin-bottom: 16px" @click="openAddDialog">
+      ➕ 添加图书
       搜索
-    </el-button>
+    </el-button> -->
 
     <!-- 图书表格 -->
     <el-table
-      :data="filteredBooks"
-
+      v-loading="loading"
+      :data="useBook.pageParamsRes.records"
       style="width: 100%"
     >
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="1" label="展示图片">
+      <el-table-column fixed prop="bookId" label="ID" width="200" />
+      <el-table-column prop="bookImage" label="展示图片">
         <template #default="scope">
           <!-- <img src="http://localhost:8080/api/d1f51447-fd2f-4a09-b676-78f63e556fa0-屏幕截图 2025-07-10 233515.png" alt="" srcset=""> -->
           <el-image
             style="width: 100%; height: 100%"
-            :src="url"
+            :src="scope.row.bookImage"
+            :preview-src-list="scope"
             :zoom-rate="1.2"
             :max-scale="7"
             :min-scale="0.2"
@@ -104,22 +153,23 @@ onMounted(() => {
           />
         </template>
       </el-table-column>
-      <el-table-column prop="title" label="书名" />
-      <el-table-column prop="author" label="作者" />
-      <el-table-column prop="price" label="价格" width="80" />
-      <el-table-column prop="1" label="余量" />
-      <el-table-column prop="1" label="出版社" />
-      <el-table-column prop="1" label="状态" />
-      <el-table-column prop="1" label="创建时间" />
-      <el-table-column prop="1" label="更新时间" />
+      <el-table-column prop="bookName" label="书名" />
+      <el-table-column prop="bookAuthor" label="作者" />
+      <el-table-column prop="bookPrice" label="价格" width="80" />
+      <el-table-column prop="bookNum" label="余量" />
+      <el-table-column prop="bookPress" label="出版社" />
+      <el-table-column prop="bookType" label="分类" />
+      <el-table-column prop="bookStatus" label="状态" />
+      <el-table-column prop="createTime" label="创建时间" />
+      <el-table-column prop="updateTime" label="更新时间" />
 
-      <el-table-column label="操作" width="200">
+      <el-table-column fixed="right" label="操作" width="200">
         <template #default="scope">
           <el-button size="small" @click="openEditDialog(scope.row)">
             编辑
           </el-button>
-          <el-button type="danger" size="small" @click="deleteBook(scope.$index)">
-            删除
+          <el-button type="danger" size="small" @click="delBook(scope.row)">
+            {{ scope.row.bookStatus === '下架' ? '上架' : '下架' }}
           </el-button>
         </template>
       </el-table-column>
@@ -147,7 +197,6 @@ onMounted(() => {
         </el-button>
       </template>
     </el-dialog> -->
-    <!-- <AddBook /> -->
     <!-- 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" title="编辑图书">
       <el-form :model="editedBook" label-width="60px">
@@ -174,18 +223,14 @@ onMounted(() => {
     <!-- 分页 -->
     <el-affix position="bottom" :offset="20" style="float: right;">
       <el-pagination
-        v-model:page-size="pageSize"
-        v-model:current-page.sync="currentPage"
+        v-model:page-size="pageParams.pageSize"
+        v-model:current-page.sync="pageParams.pageNum"
         style="margin-top: 20px;"
         :page-sizes="[10, 20, 30, 50]"
         background
         layout="sizes, prev, pager, next"
-        :total="filteredBooks.length"
+        :total="useBook.pageParamsRes.total"
       />
     </el-affix>
-
-    <!-- <el-affix position="bottom" :offset="20" style="float: right;">
-        <el-pagination background layout="prev, pager, next" :total="1000" />
-  </el-affix> -->
   </div>
 </template>

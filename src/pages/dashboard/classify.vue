@@ -38,7 +38,7 @@ async function saveEdit() {
   }
   ElMessage.success('修改成功')
   editDialogVisible.value = false
-  setTimeout(() => location.reload(), 1000)
+  bookTypeLoad()
 }
 
 async function saveAdd() {
@@ -49,18 +49,18 @@ async function saveAdd() {
   }
   ElMessage.success('添加成功')
   addDialogVisible.value = false
-  setTimeout(() => location.reload(), 1000)
+  bookTypeLoad()
 }
 
 async function deleteBookType(type: string) {
   if (confirm('确认删除?')) {
     const res = await delBookType(type)
-    if (res.code === 200) {
-      ElMessage.success('删除成功')
+    if (res.code !== 200 || !res) {
+      ElMessage.error(res.message)
       return
     }
-    ElMessage.error(res.message)
-    setTimeout(() => location.reload(), 1000)
+    ElMessage.success('删除成功')
+    bookTypeLoad()
   }
 }
 async function bookTypeLoad() {

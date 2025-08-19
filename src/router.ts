@@ -10,15 +10,15 @@ const router = createRouter({
   }, ...routes]),
 })
 
-router.beforeEach((to, _, next) => {
-  const { isAuthenticated, isAdmin } = useAuthStore()
-  if (to.name === 'login' && isAuthenticated) {
-    return next({ name: 'home' })
-  }
-  if (!to.meta.isPublic && !isAuthenticated) {
-    return next({ name: 'login' })
-  }
-  next()
-})
+// router.beforeEach((to, _, next) => {
+//   const { isAuthenticated, isAdmin } = useAuthStore()
+//   if (to.name === 'login' && isAuthenticated) {
+//     return next({ name: 'home' })
+//   }
+//   if (!to.meta.isPublic && !isAuthenticated) {
+//     return next({ name: 'login' })
+//   }
+//   next()
+// })
 
 export default router

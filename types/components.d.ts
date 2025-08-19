@@ -42,4 +42,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     Test: typeof import('./../src/components/test.vue')['default']
   }
+  export interface GlobalDirectives {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
+  }
 }

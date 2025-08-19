@@ -1,4 +1,3 @@
-
 import type { ILoginData } from '../types/user'
 import { ElMessage } from 'element-plus'
 import { getAdminInfo } from '../api/requestGet'

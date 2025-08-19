@@ -6,7 +6,7 @@ import http from '@/utils/request'
 // }
 
 export async function bookTypeAdd(bookType: string): Promise<IRes<string>> {
-  return await http.post(`/classification/add`, bookType)
+  return await http.post(`/classification/add`, { bookType })
 }
 
 export async function bookTypeUpdate(type: IBookTypeParams): Promise<IRes<string>> {
