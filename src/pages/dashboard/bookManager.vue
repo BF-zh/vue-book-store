@@ -120,7 +120,7 @@ onMounted(async () => {
     <!-- 搜索和添加 -->
     <el-input
       v-model="pageParams.keyWords"
-      placeholder="请输入书名或作者"
+      placeholder="请输入ID或书名或作者搜索"
       clearable
       style="width: 300px; margin-bottom: 16px"
       @input="loadBook()"

@@ -74,7 +74,7 @@ function logout() {
         <el-menu-item route="/dashboard/users" index="users">
           👥 用户管理
         </el-menu-item>
-        <el-menu-item route="/dashboard/classify" index="users">
+        <el-menu-item route="/dashboard/classify" index="classify">
           <el-icon><Menu /></el-icon> 分类管理
         </el-menu-item>
         <el-menu-item route="/dashboard/orders" index="orders">
