@@ -18,14 +18,7 @@ onMounted(async () => {
 })
 const router = useRouter()
 const route = useRoute()
-const activeMenu = ref<string>('books')
-
-const menuTitleMap = {
-  books: '图书管理',
-  users: '用户管理',
-  orders: '订单管理',
-  stats: '数据统计',
-}
+const activeMenu = ref<string>('')
 
 function handleMenuSelect(key: string) {
   activeMenu.value = key
@@ -42,7 +35,9 @@ function logout() {
     <!-- 左侧菜单 -->
     <el-aside width="200px" style="background: #001529; color: #bfcbd9">
       <div class="logo">
-        📚 书店后台
+        <h3 style="color: white; text-align: center; line-height: 60px; font-weight: bold; font-size: 20px;">
+          📚 书店后台
+        </h3>
       </div>
       <el-menu
         router
@@ -90,8 +85,7 @@ function logout() {
     <el-container>
       <el-header style="background: #F0F8FF; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
         <div>
-          <!-- 当前模块：{{ menuTitleMap[activeMenu] }} -->
-          当前模块：{{ route.meta.name }}
+          当前模块：{{ route.meta.title }}
         </div>
         <!-- <el-button type="danger" size="small" @click="logout">
           退出登录

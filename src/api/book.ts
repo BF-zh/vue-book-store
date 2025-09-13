@@ -1,11 +1,11 @@
-import type { IAddBookParams, IBooks, IBookType, IGetAllBooksParams, IPageParamsRes, IRes, IUpdateBookParams } from '@/types'
+import type { IAddBookParams, IBooks, IBookType, IGetAllBooksParams, IPageParamsRes, IRes, ISearchBookParams, IUpdateBookParams } from '@/types'
 import http from '@/utils/request'
 
-export async function getAllBooks(params: IGetAllBooksParams): Promise<IRes<IPageParamsRes>> {
-  return await http.post(`/books/getAll`, params)
-}
+// export async function getAllBooks(params: IGetAllBooksParams): Promise<IRes<IPageParamsRes<IBooks[]>>> {
+//   return await http.post(`/books/getAll`, params)
+// }
 
-export async function addBook(params: IAddBookParams): Promise<IRes<''>> {
+export async function addBook(params: FormData): Promise<IRes<''>> {
   return await http.post(`/books/add`, params)
 }
 
@@ -18,8 +18,8 @@ export async function deleteBook(bookId: string): Promise<IRes<''>> {
 }
 
 // 获取图书详情
-export async function getBookDetail(bookId: string): Promise<IRes<IBooks>> {
-  return await http.get(`/books/${bookId}`)
+export async function getBook(params: ISearchBookParams): Promise<IRes<IPageParamsRes<Omit<IBooks, 'id'>[]>>> {
+  return await http.post(`/books/getBooks`, params)
 }
 
 export function addBookType(type: Ref<string>) {

@@ -13,8 +13,11 @@ export interface IToken {
 
 // 用户信息
 export interface UserInfo {
-  /* 用户账号 */
+  /* 用户id */
   userId: string
+
+  /* 用户账号 */
+  username: string
 
   /* 用户密码 */
   password: string

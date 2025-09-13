@@ -3,6 +3,6 @@
 
 <template>
   <div>
-    404
+    405
   </div>
 </template>

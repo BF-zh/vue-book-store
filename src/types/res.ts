@@ -1,5 +1,3 @@
-import type { IBooks } from './books'
-
 export interface IRes<T> {
   /* 响应数据码 */
   code: number
@@ -11,9 +9,9 @@ export interface IRes<T> {
   data: T
 }
 
-export interface IPageParamsRes {
+export interface IPageParamsRes<T> {
   /* 当前页码 */
-  pageNum: number
+  currentPage: number
 
   /* */
   pageSize: number
@@ -22,5 +20,5 @@ export interface IPageParamsRes {
   total: number
 
   /* */
-  records: IBooks[]
+  records: T
 }

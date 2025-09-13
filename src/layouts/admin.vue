@@ -8,26 +8,17 @@ definePage({
     // isPublic: true,
     layout: 'admin',
     isAdmin: true,
-    name: '图书管理',
+    title: '图书管理',
   },
 })
 
 const adminStore = useAdminStore()
 
 const adminInfo = ref<AdminLoginData>()
-onMounted(async () => {
-  adminInfo.value = await adminStore.adminInfo() as AdminLoginData
-})
+
 const router = useRouter()
 const route = useRoute()
-const activeMenu = ref<string>('books')
-
-const menuTitleMap = {
-  books: '图书管理',
-  users: '用户管理',
-  orders: '订单管理',
-  stats: '数据统计',
-}
+const activeMenu = ref<string>('')
 
 function handleMenuSelect(key: string) {
   activeMenu.value = key
@@ -37,6 +28,10 @@ function logout() {
   localStorage.removeItem('token')
   router.push('/login')
 }
+onMounted(async () => {
+  adminInfo.value = await adminStore.adminInfo() as AdminLoginData
+  activeMenu.value = route.name
+})
 </script>
 
 <template>
@@ -65,7 +60,7 @@ function logout() {
             <el-menu-item route="/dashboard/bookManager" index="books">
               图书列表
             </el-menu-item>
-            <el-menu-item route="/dashboard/addBook" index="1-2">
+            <el-menu-item route="/dashboard/addBook" index="add-book">
               添加图书
             </el-menu-item>
           </el-menu-item-group>
@@ -92,8 +87,7 @@ function logout() {
     <el-container>
       <el-header style="background: #F0F8FF; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
         <div>
-          <!-- 当前模块：{{ menuTitleMap[activeMenu] }} -->
-          当前模块：{{ route.meta.name }}
+          当前模块：{{ route.meta.title }}
         </div>
         <!-- <el-button type="danger" size="small" @click="logout">
           退出登录

@@ -1,6 +1,7 @@
 import type { UploadFile } from 'element-plus'
 
 export interface IBooks {
+  id: number
   /* 书的编号 */
   bookId: string
 
@@ -52,27 +53,13 @@ export interface IAddBookParams {
   bookPress: string
 
   /* 书的类型 */
-  bookType: string
+  types: IBookType[]
 
   /* 封面图片 */
-  file: Blob
+  files: []
 
   /* 上架情况 */
   bookStatus: 1 | 0
-}
-
-export interface IGetAllBooksParams {
-  /* 当前页码 */
-  pageNum: number
-
-  /* 每页大小 */
-  pageSize: number
-
-  /* 关键字 */
-  keyWords?: string
-
-  /* 书的类型 */
-  bookType?: string
 }
 
 export interface IUpdateBookParams {
@@ -113,5 +100,25 @@ export interface IUpdateBookParams {
 export interface IBookType {
   type: string
 }
+export interface ISearchBookParams {
+  /* 书编号 */
+  bookId?: string
 
-export type TBookData = Omit<IBooks, 'bookId' | 'createTime' | 'updateTime'>
+  /* 书类型 */
+  bookType?: string
+
+  /* 搜索关键词 */
+  keywords?: string
+
+  /* 当前页码 */
+  currentPage: number
+
+  /* 每页数量 */
+  pageSize: number
+
+  /* 书的状态 */
+  bookStatus: 1 | 0 | undefined
+}
+
+// export type TBookData = Omit<IAddBookParams, 'bookId' | 'createTime' | 'updateTime'>
+export type TBookData = IAddBookParams

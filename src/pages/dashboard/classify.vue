@@ -4,7 +4,7 @@ import { bookTypeAdd, bookTypeUpdate, delBookType, getAllBookType } from '@/api/
 definePage({
   name: 'classify',
   meta: {
-    name: '分类管理',
+    title: '分类管理',
   },
 })
 
@@ -60,6 +60,7 @@ async function saveAdd() {
 }
 
 async function deleteBookType(type: string) {
+  // eslint-disable-next-line no-alert
   if (confirm('确认删除?')) {
     const res = await delBookType(type)
     if (res.code !== 200 || !res) {
@@ -119,7 +120,7 @@ onMounted(async () => {
     </el-table-column>
   </el-table>
   <el-dialog v-model="editDialogVisible" title="编辑图书类型">
-    <el-form :model="editedType" label-width="60px">
+    <el-form :model="editedType" label-width="60px" @submit.prevent>
       <el-form-item label="原类型">
         <el-input v-model="editedType.oldType" />
       </el-form-item>
@@ -137,7 +138,7 @@ onMounted(async () => {
     </template>
   </el-dialog>
   <el-dialog v-model="addDialogVisible" title="添加图书类型">
-    <el-form :model="editedType" label-width="60px">
+    <el-form :model="editedType" label-width="60px" @submit.prevent>
       <el-form-item label="新类型">
         <el-input v-model="editedType.newType" />
       </el-form-item>
