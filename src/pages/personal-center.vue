@@ -10,7 +10,6 @@ import {
   StarFilled,
   UserFilled,
 } from '@element-plus/icons-vue'
-import {...a}  from '@element-plus/icons-vue'
 import { UserApi } from '@/api'
 import { userCenterStore } from '@/store/userCenter'
 
