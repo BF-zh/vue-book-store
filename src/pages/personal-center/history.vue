@@ -1,86 +1,111 @@
 <script setup lang="ts">
 definePage({
-  name: 'favorites',
+  name: 'history',
   meta: {
-    name: '我的收藏',
+    name: '浏览记录',
   },
 })
 
-// 收藏数据
-const favorites = ref([
+// 浏览记录数据
+const browsingHistory = ref([
   {
     id: 1,
-    title: '深入浅出Vue.js',
-    author: '刘博文',
-    price: 89.00,
-    cover: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
-    date: '2023-04-20',
-  },
-  {
-    id: 2,
-    title: 'React实战',
-    author: '陈天',
-    price: 95.00,
-    cover: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
-    date: '2023-04-15',
-  },
-  {
-    id: 3,
-    title: 'Node.js实战',
-    author: 'Mike Cantelon',
-    price: 109.00,
-    cover: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
-    date: '2023-04-10',
-  },
-  {
-    id: 4,
     title: 'Vue.js设计与实现',
     author: '霍春阳',
     price: 99.00,
     cover: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
-    date: '2023-04-05',
+    date: '2023-05-15',
+  },
+  {
+    id: 2,
+    title: 'JavaScript高级程序设计',
+    author: 'Nicholas C. Zakas',
+    price: 129.00,
+    cover: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
+    date: '2023-05-10',
+  },
+  {
+    id: 3,
+    title: '你不知道的JavaScript',
+    author: 'Kyle Simpson',
+    price: 79.00,
+    cover: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
+    date: '2023-05-01',
+  },
+  {
+    id: 4,
+    title: '深入浅出Vue.js',
+    author: '刘博文',
+    price: 89.00,
+    cover: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
+    date: '2023-04-28',
+  },
+  {
+    id: 5,
+    title: 'React实战',
+    author: '陈天',
+    price: 95.00,
+    cover: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
+    date: '2023-04-25',
   },
 ])
 
-// 删除收藏
-function deleteFavorite(id: number) {
-  ElMessageBox.confirm('确定要取消收藏这本书吗？', '提示', {
+// 删除浏览记录
+function deleteHistory(id: number) {
+  ElMessageBox.confirm('确定要删除这条浏览记录吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    favorites.value = favorites.value.filter(item => item.id !== id)
-    ElMessage.success('已取消收藏')
+    browsingHistory.value = browsingHistory.value.filter(item => item.id !== id)
+    ElMessage.success('删除成功')
   }).catch(() => {
     ElMessage.info('已取消操作')
   })
+}
+
+// 清空浏览记录
+function clearHistory() {
+  ElMessageBox.confirm('确定要清空所有浏览记录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    browsingHistory.value = []
+    ElMessage.success('浏览记录已清空')
+  }).catch(() => {
+    ElMessage.info('已取消操作')
+  })
+}
+
+// 再次查看
+function viewAgain(id: number) {
+  ElMessage.success('跳转到书籍详情页')
 }
 
 // 加入购物车
 function addToCart(id: number) {
   ElMessage.success('已添加到购物车')
 }
-
-// 查看详情
-function viewDetail(id: number) {
-  ElMessage.info(`查看书籍 ${id} 的详情`)
-}
 </script>
 
 <template>
-  <div class="favorites-page">
+  <div class="history-page">
     <el-card class="content-card">
       <template #header>
         <div class="card-header">
-          <span>我的收藏</span>
+          <span>浏览记录</span>
+          <el-button type="danger" :disabled="browsingHistory.length === 0" @click="clearHistory">
+            清空记录
+          </el-button>
         </div>
       </template>
 
-      <div class="favorites-list">
+      <div class="history-list">
         <div
-          v-for="item in favorites"
+          v-for="item in browsingHistory"
           :key="item.id"
-          class="favorite-item"
+          class="history-item"
         >
           <div class="book-cover">
             <el-image
@@ -101,18 +126,18 @@ function viewDetail(id: number) {
               ¥{{ item.price }}
             </div>
           </div>
-          <div class="favorite-date">
-            收藏时间：{{ item.date }}
+          <div class="history-date">
+            浏览时间：{{ item.date }}
           </div>
-          <div class="favorite-actions">
-            <el-button type="primary" size="small" @click="viewDetail(item.id)">
-              查看详情
+          <div class="history-actions">
+            <el-button type="primary" size="small" @click="viewAgain(item.id)">
+              再次查看
             </el-button>
             <el-button type="success" size="small" @click="addToCart(item.id)">
               加入购物车
             </el-button>
-            <el-button type="danger" size="small" @click="deleteFavorite(item.id)">
-              取消收藏
+            <el-button type="danger" size="small" @click="deleteHistory(item.id)">
+              删除
             </el-button>
           </div>
         </div>
@@ -120,15 +145,15 @@ function viewDetail(id: number) {
 
       <!-- 空状态 -->
       <el-empty
-        v-if="favorites.length === 0"
-        description="暂无收藏"
+        v-if="browsingHistory.length === 0"
+        description="暂无浏览记录"
       />
     </el-card>
   </div>
 </template>
 
 <style scoped>
-.favorites-page {
+.history-page {
   padding: 20px 0;
 }
 
@@ -143,13 +168,13 @@ function viewDetail(id: number) {
   align-items: center;
 }
 
-.favorites-list {
+.history-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-.favorite-item {
+.history-item {
   display: flex;
   align-items: center;
   padding: 15px;
@@ -158,7 +183,7 @@ function viewDetail(id: number) {
   transition: all 0.3s;
 }
 
-.favorite-item:hover {
+.history-item:hover {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -197,13 +222,13 @@ function viewDetail(id: number) {
   font-size: 16px;
 }
 
-.favorite-date {
+.history-date {
   color: #909399;
   margin-right: 15px;
   width: 150px;
 }
 
-.favorite-actions {
+.history-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -217,7 +242,7 @@ function viewDetail(id: number) {
 }
 
 @media (max-width: 768px) {
-  .favorite-item {
+  .history-item {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -235,13 +260,13 @@ function viewDetail(id: number) {
     margin-bottom: 15px;
   }
 
-  .favorite-date {
+  .history-date {
     width: 100%;
     margin-right: 0;
     margin-bottom: 15px;
   }
 
-  .favorite-actions {
+  .history-actions {
     width: 100%;
     flex-direction: row;
     flex-wrap: wrap;

@@ -1,4 +1,7 @@
-import type { ILoginData, IRegisterData, IRes, IToken } from '@/types'
+import type { IGetAllUserInfoParams, ILoginData, IPageParamsRes, IRegisterData, IRes, IToken, UserInfo } from '@/types'
+import http from '@/utils/request'
+
+const baseUrl = '/users'
 //  用户登录 type = user 即普通用户 admin 即管理员
 export function login(_data: ILoginData) {
   const url = computed(() => `/${_data.type}/login`)
@@ -13,8 +16,8 @@ export function login(_data: ILoginData) {
       ElMessage.success(message)
       setToken(data.token, isAdmin.value ? 'admin' : 'user')
       setTimeout(() => {
-        router.push(isAdmin.value ? '/dashboard' : '')
-      }, 500);
+        router.push(isAdmin.value ? '/dashboard' : 'home')
+      }, 500)
     },
   })
 }
@@ -23,7 +26,7 @@ export function login(_data: ILoginData) {
 export function register() {
   const router = useRouter()
   const { setToken } = useAuthStore()
-  return useRequest<IRes<IToken>, IRegisterData>('/users/register', {
+  return useRequest<IRes<IToken>, IRegisterData>(`${baseUrl}/register`, {
     method: 'POST',
     success({ code, data, message }) {
       if (code !== 200)
@@ -31,8 +34,20 @@ export function register() {
       ElMessage.success(message)
       setToken(data.token, 'user')
       setTimeout(() => {
-        router.push('/user')
-      }, 500);
-    }
+        router.push('/home')
+      }, 500)
+    },
   })
+}
+
+export async function getAllUserInfo(params: IGetAllUserInfoParams): Promise<IRes<IPageParamsRes<UserInfo[]>>> {
+  return await http.post(`${baseUrl}/getAllUserInfo`, params)
+}
+
+export async function updateUserStatus(params: { userId: number, status: number }): Promise<IRes<''>> {
+  return await http.post(`${baseUrl}/updateUserStatus/${params.userId}/${params.status}`)
+}
+
+export async function getUserInfo(): Promise<IRes<UserInfo>> {
+  return await http.get(`${baseUrl}/getUserInfo`)
 }

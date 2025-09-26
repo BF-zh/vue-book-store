@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { bookTypeAdd, bookTypeUpdate, delBookType, getAllBookType } from '@/api/classify'
+import { classifyApi } from '@/api'
 
 definePage({
   name: 'classify',
@@ -11,14 +11,11 @@ definePage({
 const searchKeyword = ref('')
 const editDialogVisible = ref(false)
 const addDialogVisible = ref(false)
-interface IfilteredType {
+interface IFilteredType {
   id: number
   bookType: string
 }
-const filteredType = ref<IfilteredType[]>([{
-  id: 1,
-  bookType: '',
-}])
+const filteredType = ref<IFilteredType[]>([] as IFilteredType[])
 const editedType = reactive({
   oldType: '',
   newType: '',
@@ -30,15 +27,15 @@ function openEditDialog(row: any) {
 }
 
 async function search() {
-  const type = await getAllBookType(searchKeyword.value)
+  const type = await classifyApi.getAllBookType(searchKeyword.value)
   filteredType.value = []
   let i = 1
-  type.data.forEach((k) => {
+  type.data.forEach((k: { bookType: string }) => {
     filteredType.value?.push({ id: i++, bookType: k.bookType })
   })
 }
 async function saveEdit() {
-  const res = await bookTypeUpdate(editedType)
+  const res = await classifyApi.bookTypeUpdate(editedType)
   if (res.code !== 200 || !res) {
     ElMessage.error(res.message)
     return
@@ -47,45 +44,45 @@ async function saveEdit() {
   editDialogVisible.value = false
   bookTypeLoad()
 }
-
 async function saveAdd() {
-  const res = await bookTypeAdd(editedType.newType)
-  if (res.code !== 200 || !res) {
-    ElMessage.error(res.message)
-    return
+  try {
+    await classifyApi.bookTypeAdd(editedType.newType)
+    ElMessage.success('添加成功')
+    addDialogVisible.value = false
+    bookTypeLoad()
   }
-  ElMessage.success('添加成功')
-  addDialogVisible.value = false
-  bookTypeLoad()
+  catch (error: any) { ElMessage.error(error.message) }
 }
 
 async function deleteBookType(type: string) {
   // eslint-disable-next-line no-alert
   if (confirm('确认删除?')) {
-    const res = await delBookType(type)
-    if (res.code !== 200 || !res) {
-      ElMessage.error(res.message)
-      return
+    try {
+      await classifyApi.delBookType(type)
+      ElMessage.success('删除成功')
+      bookTypeLoad()
     }
-    ElMessage.success('删除成功')
-    bookTypeLoad()
+    catch (error: any) { ElMessage.error(error.message) }
   }
 }
 async function bookTypeLoad() {
-  const type = await getAllBookType('')
-  filteredType.value = []
-  let i = 1
-  type.data.forEach((k) => {
-    filteredType.value?.push({ id: i++, bookType: k.bookType })
-  })
+  try {
+    const type = await classifyApi.getAllBookType('')
+    filteredType.value = []
+    let i = 1
+    type.data.forEach((k: { bookType: string }) => {
+      filteredType.value?.push({ id: i++, bookType: k.bookType })
+    })
+  }
+  catch (error: any) { ElMessage.error(error.message) }
 }
-async function handleError() {
+function handleError() {
   searchKeyword.value = ''
-  await bookTypeLoad()
+  bookTypeLoad()
 }
 
-onMounted(async () => {
-  await bookTypeLoad()
+onMounted(() => {
+  bookTypeLoad()
 })
 </script>
 

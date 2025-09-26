@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { AdminLoginData } from '@/types'
+import type { IAdminInfoVo } from '@/types'
 import { Menu, Setting } from '@element-plus/icons-vue'
+import { AdminApi } from '@/api'
 
 // definePage({
 //   name: 'dashboard',
@@ -10,24 +11,52 @@ import { Menu, Setting } from '@element-plus/icons-vue'
 //   },
 // })
 
-const adminStore = useAdminStore()
-
-const adminInfo = ref<AdminLoginData>()
-onMounted(async () => {
-  adminInfo.value = await adminStore.adminInfo() as AdminLoginData
-})
+const adminInfo = ref<IAdminInfoVo>({} as IAdminInfoVo)
 const router = useRouter()
 const route = useRoute()
 const activeMenu = ref<string>('')
 
 function handleMenuSelect(key: string) {
-  activeMenu.value = key
+  sessionStorage.setItem('activeMenu', key)
+  const active = sessionStorage.getItem('activeMenu') as string
+  activeMenu.value = active
 }
-
 function logout() {
-  localStorage.removeItem('token')
+  // localStorage.removeItem('__USER_AUTH__')
   router.push('/login')
 }
+onMounted(async () => {
+  activeMenu.value = sessionStorage.getItem('activeMenu') || 'dashboard'
+  try {
+    const res = await AdminApi.getAdminInfo()
+    adminInfo.value = res.data
+  }
+  catch (error: any) {
+    ElMessage.error(error.message)
+    setTimeout(() => {
+      router.push('/login')
+    }, 1000)
+  }
+})
+onBeforeUnmount(() => {
+  sessionStorage.removeItem('activeMenu')
+  localStorage.removeItem('__USER_AUTH__')
+})
+
+router.beforeEach((to, from, next) => {
+  const __USER_AUTH__: { isAdmin: boolean, token: string } = JSON.parse(localStorage.getItem('__USER_AUTH__') as string)
+  if (!__USER_AUTH__) {
+    ElMessage.error('请先登录')
+    router.push('/login')
+    return
+  }
+  if (!__USER_AUTH__.isAdmin) {
+    ElMessage.error('无权限访问')
+    router.push('/')
+    return
+  }
+  next()
+})
 </script>
 
 <template>
@@ -58,14 +87,11 @@ function logout() {
             <el-menu-item route="/dashboard/bookManager" index="books">
               图书列表
             </el-menu-item>
-            <el-menu-item route="/dashboard/addBook" index="1-2">
+            <el-menu-item route="/dashboard/addBook" index="add-book">
               添加图书
             </el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
-        <!-- <el-menu-item route="/dashboard/bookManager" index="books">
-          📘 图书管理
-        </el-menu-item> -->
         <el-menu-item route="/dashboard/users" index="users">
           👥 用户管理
         </el-menu-item>
@@ -108,10 +134,6 @@ function logout() {
         </el-dropdown>
       </el-header>
       <el-main>
-        <!-- <div v-if="activeMenu === 'books'">📘 图书管理页面（可展示表格）</div>
-        <div v-else-if="activeMenu === 'users'">👥 用户管理页面</div>
-        <div v-else-if="activeMenu === 'orders'">🛒 订单管理页面</div>
-        <div v-else-if="activeMenu === 'stats'">📈 数据统计页面</div> -->
         <router-view />
       </el-main>
     </el-container>

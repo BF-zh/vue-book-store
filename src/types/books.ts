@@ -1,5 +1,3 @@
-import type { UploadFile } from 'element-plus'
-
 export interface IBooks {
   id: number
   /* 书的编号 */
@@ -93,8 +91,8 @@ export interface IUpdateBookParams {
   /** 分类 */
   types: string[]
 
-  /* 封面图片 */
-  files: UploadFile[]
+  // /* 封面图片 */
+  // files: UploadFile[]
 }
 
 export interface IBookType {

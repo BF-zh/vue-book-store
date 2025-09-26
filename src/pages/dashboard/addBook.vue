@@ -125,7 +125,7 @@ async function submitUpload() {
     fd.append('bookStatus', String(formData.bookStatus))
     fd.append('bookNum', String(formData.bookNum))
     fd.append('bookType', String(formData.types))
-    console.log('提交数据') // 这里可以调用 API 上传数据
+    // console.log('提交数据') // 这里可以调用 API 上传数据
     // await uploadBook(fd) // 假设有一个 uploadBook 函数来处理上传
     await addBook(fd)
     formData.files = [] // 清空已上传的文件
@@ -133,8 +133,8 @@ async function submitUpload() {
     // console.log('上传成功')
     ElMessage.success('添加成功')
   }
-  catch {
-    console.log('error')
+  catch (e: any) {
+    ElMessage.error(e.message || '添加失败')
   }
 }
 const upload = useTemplateRef<UploadInstance>('upload')

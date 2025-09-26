@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { IBooks, IResTypeData } from '@/types'
-import { ArrowRight, ArrowUp, Memo, ShoppingCart } from '@element-plus/icons-vue'
-import { getBook } from '@/api/book'
-import { getAllBookType } from '@/api/classify'
+import type { IBooks, UserInfo } from '@/types'
+import { ArrowRight, ArrowUp, ShoppingCart } from '@element-plus/icons-vue'
+import { BookApi, classifyApi, UserApi } from '@/api'
 // 路由实例
 const router = useRouter()
 const bookStore = useBookStore()
@@ -12,20 +11,17 @@ const showMobileMenu = ref(false)
 const activeCategory = ref('全部')
 const isLoggedIn = ref(false) // 模拟用户登录状态
 const cartItemCount = ref(0) // 模拟购物车商品数量
+
 // 分类导航滚动相关
 const categoryNavRef = ref<HTMLElement | null>(null)
 const showLeftArrow = ref(false)
 const showRightArrow = ref(true)
+
+const userInfo = ref<UserInfo>()
+
 // 分类列表
 const categoryList = ref([
   { label: '全部书籍', value: '全部' },
-  { label: '文学艺术', value: 'literature' },
-  { label: '人文社科', value: 'social' },
-  { label: '经济管理', value: 'management' },
-  { label: '科学技术', value: 'tech' },
-  { label: '少儿童书', value: 'children' },
-  { label: '教育考试', value: 'education' },
-  { label: '生活休闲', value: 'life' },
 ])
 
 // Banner数据
@@ -182,14 +178,6 @@ const bannerList = ref([
 
 const books = ref<Omit<IBooks, 'id'>[]>([])
 
-// 计算属性：过滤后的书籍
-// const filteredBooks = computed(() => {
-//   if (activeCategory.value === 'all') {
-//     return books.value.filter(book => !book.isNew)
-//   }
-//   return books.value.filter(book => book.category === activeCategory.value && !book.isNew)
-// })
-
 // 计算属性：新书推荐
 const newBooks = computed(() => {
   return books.value.filter(book => book.isNew)
@@ -200,30 +188,38 @@ async function loadBooks() {
   bookStore.searchBookParams.pageSize = 12
   bookStore.searchBookParams.currentPage = 1
   bookStore.searchBookParams.bookStatus = 1
-  const bookRes = await getBook(bookStore.searchBookParams)
-  if (bookRes.code !== 200) {
-    ElMessage.error('获取书籍列表失败')
-    books.value = []
-    return
+  try {
+    const res = await BookApi.getBook(bookStore.searchBookParams)
+    books.value = res.data.records
   }
-  books.value = bookRes.data.records
+  catch (e: any) {
+    ElMessage.error(e.message || '获取书籍列表失败')
+    books.value = []
+  }
 }
 
 // 生命周期钩子
 onMounted(async () => {
   categoryList.value = [{ label: '全部书籍', value: '全部' }]
-  const bookTypeRes = await getAllBookType('')
-  if (bookTypeRes.code === 200) {
-    bookTypeRes.data.forEach((item) => {
+
+  try {
+    const res = await classifyApi.getAllBookType('')
+    res.data.forEach((item) => {
       categoryList.value.push({ label: item.bookType, value: item.bookType })
     })
+    await loadBooks()
+    const userRes = await UserApi.getUserInfo()
+    userInfo.value = userRes.data
+    isLoggedIn.value = true
+    // 添加滚动事件监听
+    if (categoryNavRef.value) {
+      categoryNavRef.value.addEventListener('scroll', checkScroll)
+      // 初始检查
+      checkScroll()
+    }
   }
-  await loadBooks()
-  // 添加滚动事件监听
-  if (categoryNavRef.value) {
-    categoryNavRef.value.addEventListener('scroll', checkScroll)
-    // 初始检查
-    checkScroll()
+  catch (e: any) {
+    ElMessage.error(e.message || '获取书籍分类失败')
   }
 })
 
@@ -232,26 +228,27 @@ onUnmounted(() => {
   if (categoryNavRef.value) {
     categoryNavRef.value.removeEventListener('scroll', checkScroll)
   }
+
+  // localStorage.removeItem('__USER_AUTH__')
 })
-// 方法：查看书籍详情
+// 查看书籍详情
 function viewBookDetails(bookId: string) {
   router.push(`/book/${bookId}`)
 }
 
-// 方法：按分类筛选书籍
+// 按分类筛选书籍
 async function filterBooksByCategory(category: string) {
   activeCategory.value = category
-  // bookStore.searchBookParams.bookType = category
   await loadBooks()
 }
 
-// 方法：重置筛选
+// 重置筛选
 function resetFilter() {
   activeCategory.value = '全部'
   searchInput.value = ''
 }
 
-// 方法：搜索书籍
+// 搜索书籍
 function handleSearch() {
   if (!searchInput.value.trim()) {
     ElMessage.warning('请输入搜索关键词')
@@ -264,7 +261,7 @@ function handleSearch() {
   })
 }
 
-// 方法：加入购物车
+// 加入购物车
 function addToCart(book: any) {
   // 实际项目中可调用购物车接口
   ElMessage({
@@ -292,7 +289,7 @@ function goToCart() {
 }
 
 function goToUserCenter() {
-  router.push('/user')
+  router.push('/personal-center')
 }
 
 function goToLogin() {
@@ -333,6 +330,7 @@ function handleCommand(command: string) {
     case 'logout':
       isLoggedIn.value = false
       ElMessage.success('已退出登录')
+      localStorage.removeItem('__USER_AUTH__')
       break
     case 'cart':
       goToCart()
@@ -407,9 +405,7 @@ definePage({
           <ElDropdown @command="handleCommand">
             <div class="flex cursor-pointer items-center">
               <div class="border-2 border-gray-300 rounded-full bg-gray-100 flex h-9 w-9 shadow-sm items-center justify-center">
-                <!-- <ElIcon class="text-lg text-gray-600">
-                  <i class="ep-user" />
-                </ElIcon> -->
+                <img v-if="userInfo?.imageUrl" :src="userInfo?.imageUrl" class="rounded-full h-9 w-9">
               </div>
             </div>
             <template #dropdown>

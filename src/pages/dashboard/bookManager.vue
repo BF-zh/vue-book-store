@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { UploadFile, UploadUserFile } from 'element-plus'
 import type { IBooks } from '@/types'
-import { deleteBook, getBook } from '@/api/book'
-import { getAllBookType } from '@/api/classify'
+import { BookApi, classifyApi } from '@/api'
 
 definePage({
   name: 'books',
@@ -22,16 +22,6 @@ const pageParams = reactive({
   bookId: '',
   bookStatus: undefined,
 })
-// const filteredBooks = computed(() => {
-//   const keyword1 = keyword.value.trim().toLowerCase()
-//   if (!keyword1)
-//     return books
-//   return books.filter(
-//     book =>
-//       book.title.toLowerCase().includes(keyword)
-//       || book.author.toLowerCase().includes(keyword),
-//   )
-// })
 
 function delBook(row: IBooks) {
   const str = row.bookStatus === '下架' ? '上架' : '下架'
@@ -46,7 +36,7 @@ function delBook(row: IBooks) {
     },
   )
     .then(async () => {
-      await deleteBook(row.bookId)
+      await BookApi.deleteBook(row.bookId)
       await loadBook()
       ElMessage.success(`${str}成功`)
       // location.reload()
@@ -57,36 +47,74 @@ function delBook(row: IBooks) {
 }
 
 // 编辑逻辑
+const edit = reactive({
+  dialogVisible: false,
+  book: {} as Omit<IBooks, 'id'>,
+})
 
-const editDialogVisible = ref(false)
-const editedBook = ref({})
+const uploadRef = ref()
+const tempFileList = ref<UploadUserFile[]>([])
 
 function openEditDialog(book: IBooks) {
-  editedBook.value = { ...book }
-  editDialogVisible.value = true
+  edit.book = { ...book }
+  edit.dialogVisible = true
 }
 
-function saveEdit() {
-  const index = books.findIndex(b => b.id === editedBook.value.id)
-  if (index !== -1) {
-    books[index] = { ...editedBook.value }
+function handleFileChange(file: UploadFile) {
+  // 将图片转换为预览URL
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    edit.book.bookImage = e.target?.result as string
   }
-  editDialogVisible.value = false
+  if (file.raw) {
+    reader.readAsDataURL(file.raw)
+  }
+}
+
+async function saveEdit() {
+  const fd = new FormData()
+  edit.book.bookStatus = edit.book.bookStatus === '上架' ? 1 : 0
+  fd.append('bookId', edit.book.bookId)
+  fd.append('bookName', edit.book.bookName)
+  fd.append('bookAuthor', edit.book.bookAuthor)
+  fd.append('bookPrice', edit.book.bookPrice.toString())
+  fd.append('bookStatus', edit.book.bookStatus.toString())
+  fd.append('bookNum', edit.book.bookNum.toString())
+  fd.append('bookPress', edit.book.bookPress)
+  fd.append('bookType', edit.book.bookType)
+  tempFileList.value[0] && fd.append('file', tempFileList.value[0].raw as Blob)
+  try {
+    await BookApi.updateBook(fd)
+    tempFileList.value = []
+  }
+  catch (e: any) {
+    ElMessage.error(e.message || '编辑图书失败')
+  }
+  await loadBook()
+  setTimeout(() => {
+    ElMessage.success('修改成功')
+  }, 800)
+  edit.dialogVisible = false
 }
 
 async function loadBook() {
-  const res = await getBook(pageParams)
-  let i = 1
-  useBook.pageParamsRes.records = []
-  res.data.records.forEach((k) => {
-    useBook.pageParamsRes.records.push({ id: i++, ...k })
-  })
-  useBook.pageParamsRes.currentPage = res.data.currentPage
-  useBook.pageParamsRes.pageSize = res.data.pageSize
-  useBook.pageParamsRes.total = res.data.total
-  useBook.pageParamsRes.records.forEach((k) => {
-    k.bookStatus = k.bookStatus ? '上架' : '下架'
-  })
+  try {
+    const res = await BookApi.getBook(pageParams)
+    let i = 1
+    useBook.pageParamsRes.records = []
+    res.data.records.forEach((k) => {
+      useBook.pageParamsRes.records.push({ id: i++, ...k })
+    })
+    useBook.pageParamsRes.currentPage = res.data.currentPage
+    useBook.pageParamsRes.pageSize = res.data.pageSize
+    useBook.pageParamsRes.total = res.data.total
+    useBook.pageParamsRes.records.forEach((k) => {
+      k.bookStatus = k.bookStatus ? '上架' : '下架'
+    })
+  }
+  catch (e: any) {
+    ElMessage.error(e.message || '获取图书列表失败')
+  }
 }
 
 async function handlePageChange() {
@@ -99,18 +127,20 @@ const options = ref<{ label: string, value: string }[]>([
 ])
 
 async function changeHandler() {
-  // console.log(type.value)
   pageParams.bookType = type.value === '全部' ? '' : type.value
-  // await getAllBooks(pageParams)
   await loadBook()
 }
 
 onMounted(async () => {
   await loadBook()
   loading.value = false
-
-  const res = await getAllBookType('')
-  res.data.forEach(k => options.value.push({ label: k.bookType, value: k.bookType }))
+  try {
+    const res = await classifyApi.getAllBookType('')
+    res.data.forEach(k => options.value.push({ label: k.bookType, value: k.bookType }))
+  }
+  catch (e: any) {
+    ElMessage.error(e.message || '获取图书分类失败')
+  }
 })
 </script>
 
@@ -185,20 +215,66 @@ onMounted(async () => {
       </el-table-column>
     </el-table>
     <!-- 编辑弹窗 -->
-    <el-dialog v-model="editDialogVisible" title="编辑图书">
-      <el-form :model="editedBook" label-width="60px">
+    <el-dialog v-model="edit.dialogVisible" title="编辑图书" width="500px">
+      <el-form :model="edit.book" label-width="80px">
         <el-form-item label="书名">
-          <el-input v-model="editedBook.title" />
+          <el-input v-model="edit.book.bookName" />
         </el-form-item>
         <el-form-item label="作者">
-          <el-input v-model="editedBook.author" />
+          <el-input v-model="edit.book.bookAuthor" />
         </el-form-item>
         <el-form-item label="价格">
-          <el-input v-model="editedBook.price" type="number" />
+          <el-input v-model.number="edit.book.bookPrice" type="number" />
+        </el-form-item>
+        <el-form-item label="库存">
+          <el-input v-model.number="edit.book.bookNum" type="number" />
+        </el-form-item>
+        <el-form-item label="出版社">
+          <el-input v-model="edit.book.bookPress" />
+        </el-form-item>
+        <el-form-item label="分类">
+          <el-select v-model="edit.book.bookType" placeholder="请选择分类">
+            <el-option
+              v-for="item in options.filter(opt => opt.value !== '')"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-switch
+            v-model="edit.book.bookStatus"
+            active-value="上架"
+            inactive-value="下架"
+            active-text="上架"
+            inactive-text="下架"
+          />
+        </el-form-item>
+        <el-form-item label="图书图片">
+          <el-upload
+            ref="uploadRef"
+            v-model:file-list="tempFileList"
+            class="avatar-uploader"
+            :auto-upload="false"
+            :show-file-list="false"
+            :on-change="handleFileChange"
+            accept="image/*"
+          >
+            <div class="image-upload-container">
+              <img v-if="edit.book.bookImage" :src="edit.book.bookImage" class="book-image">
+              <el-icon v-else class="avatar-uploader-icon">
+                <Plus />
+              </el-icon>
+              <div class="image-overlay">
+                <span>{{ edit.book.bookImage ? '点击更换图片' : '点击上传图片' }}</span>
+              </div>
+            </div>
+          </el-upload>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="editDialogVisible = false">
+        <el-button @click="edit.dialogVisible = false">
           取消
         </el-button>
         <el-button type="primary" @click="saveEdit">
@@ -222,3 +298,56 @@ onMounted(async () => {
     </el-affix>
   </div>
 </template>
+
+<style scoped>
+.avatar-uploader .avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 120px;
+  height: 120px;
+  text-align: center;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-uploader .avatar-uploader-icon:hover {
+  border-color: #409eff;
+}
+
+.book-image {
+  width: 120px;
+  height: 120px;
+  display: block;
+  object-fit: cover;
+}
+
+.image-upload-container {
+  position: relative;
+  display: inline-block;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  height: 120px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.image-upload-container:hover .image-overlay {
+  opacity: 1;
+}
+</style>
