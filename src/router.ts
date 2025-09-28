@@ -6,14 +6,14 @@ const router = createRouter({
   history: createWebHistory(),
   routes: setupLayouts([{
     path: '/',
-    redirect: { name: 'login' },
+    redirect: { name: 'home' },
   }, ...routes]),
 })
 
 router.beforeEach((to, _, next) => {
   const { isAuthenticated, isAdmin } = useAuthStore()
   if (to.name === 'login' && isAuthenticated) {
-    return next({ name: isAdmin ? 'dashboard' : 'home' })
+    return next({ name: 'home' })
   }
   if (!to.meta.isPublic && !isAuthenticated) {
     return next({ name: 'login' })

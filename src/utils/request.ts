@@ -6,16 +6,18 @@ const http = axios.create({
 })
 
 http.interceptors.request.use((config) => {
-  config.headers.Authorization = `Bearer ${localStorage.getItem('token')}`
+  const __USER_AUTH__ = localStorage.getItem('__USER_AUTH__')
+
+  config.headers.Authorization = `Bearer ${__USER_AUTH__ ? JSON.parse(__USER_AUTH__).token : ''}`
   return config
 })
 
 http.interceptors.response.use(
   (res) => {
     const { data } = res
-    // if (data.code !== 200) {
-    //   return Promise.reject(new Error(data.message || 'Error'))
-    // }
+    if (data.code !== 200) {
+      return Promise.reject(new Error(data.message || 'Error'))
+    }
 
     return Promise.resolve(data)
   },

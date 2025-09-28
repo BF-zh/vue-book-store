@@ -1,5 +1,6 @@
 export * from './admin'
 export * from './books'
+export * from './bookType'
 export * from './res'
 export * from './typeing'
 export * from './user'

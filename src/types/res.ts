@@ -8,3 +8,17 @@ export interface IRes<T> {
   /* 响应数据 */
   data: T
 }
+
+export interface IPageParamsRes<T> {
+  /* 当前页码 */
+  currentPage: number
+
+  /* */
+  pageSize: number
+
+  /* */
+  total: number
+
+  /* */
+  records: T
+}

@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import type { AdminLoginData } from '@/types'
-import { Setting } from '@element-plus/icons-vue'
+import { Menu, Setting } from '@element-plus/icons-vue'
+
+definePage({
+  name: 'dashboard',
+  meta: {
+    // isPublic: true,
+    layout: 'admin',
+    isAdmin: true,
+    title: '图书管理',
+  },
+})
 
 const adminStore = useAdminStore()
 
 const adminInfo = ref<AdminLoginData>()
-onMounted(async () => {
-  // adminInfo.value = await adminStore.adminInfo() as AdminLoginParams
-})
 
 const router = useRouter()
-const activeMenu = ref<string>('books')
-
-const menuTitleMap = {
-  'books': '图书管理',
-  'users': '用户管理',
-  'book-type': '图书分类',
-  'orders': '订单管理',
-  'stats': '数据统计',
-}
+const route = useRoute()
+const activeMenu = ref<string>('')
 
 function handleMenuSelect(key: string) {
   activeMenu.value = key
@@ -28,6 +28,10 @@ function logout() {
   localStorage.removeItem('token')
   router.push('/login')
 }
+onMounted(async () => {
+  adminInfo.value = await adminStore.adminInfo() as AdminLoginData
+  activeMenu.value = route.name
+})
 </script>
 
 <template>
@@ -52,20 +56,23 @@ function logout() {
             <span> 图书管理</span>
           </template>
           <el-menu-item-group>
-            <el-menu-item route="/dashboard/bookManager" index="bookManager">
+            <template #title />
+            <el-menu-item route="/dashboard/bookManager" index="books">
               图书列表
             </el-menu-item>
-            <el-menu-item route="/dashboard/addBook" index="addBook">
+            <el-menu-item route="/dashboard/addBook" index="add-book">
               添加图书
-            </el-menu-item>
-            <el-menu-item route="/dashboard/book-type" index="book-type">
-              📘  图书分类
             </el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
-
+        <!-- <el-menu-item route="/dashboard/bookManager" index="books">
+          📘 图书管理
+        </el-menu-item> -->
         <el-menu-item route="/dashboard/users" index="users">
           👥 用户管理
+        </el-menu-item>
+        <el-menu-item route="/dashboard/classify" index="classify">
+          <el-icon><Menu /></el-icon> 分类管理
         </el-menu-item>
         <el-menu-item route="/dashboard/orders" index="orders">
           🛒 订单管理
@@ -80,7 +87,7 @@ function logout() {
     <el-container>
       <el-header style="background: #F0F8FF; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
         <div>
-          当前模块：{{ menuTitleMap[activeMenu] }}
+          当前模块：{{ route.meta.title }}
         </div>
         <!-- <el-button type="danger" size="small" @click="logout">
           退出登录
@@ -114,16 +121,5 @@ function logout() {
 </template>
 
 <style scoped>
-.logo {
-  font-size: 18px;
-  font-weight: bold;
-  padding: 20px;
-  text-align: center;
-}
-.example-showcase .el-dropdown-link {
-  cursor: pointer;
-  color: var(--el-color-primary);
-  display: flex;
-  align-items: center;
-}
+
 </style>
